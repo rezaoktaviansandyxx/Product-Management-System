@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\Auditable;
+use App\Traits\UsesUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Supplier extends Model
+{
+    use HasFactory, SoftDeletes, UsesUuid, Auditable;
+
+    protected $fillable = [
+        'name',
+        'contact_info',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'contact_info' => 'array',
+        'is_active' => 'boolean'
+    ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+}
