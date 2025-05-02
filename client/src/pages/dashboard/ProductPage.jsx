@@ -5,15 +5,15 @@ import AppConfig from '../../config/AppConfig';
 const ProductPage = () => {
 
   const [products, setProducts] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      fetchProducts();
     }
-  }, []);
+
+    fetchProducts();
+  }, [token]);
 
   const fetchProducts = async () => {
     try {

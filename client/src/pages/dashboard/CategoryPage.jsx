@@ -6,21 +6,20 @@ import AppConfig from '../../config/AppConfig';
 const CategoryPage = () => {
 
   const [categories, setCategories] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      fetchCategories();
     }
-  }, []);
+
+    fetchCategories();
+  }, [token]);
 
   const fetchCategories = async () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/categories');
       setCategories(response.data.data);
-      console.log(response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -39,7 +38,7 @@ const CategoryPage = () => {
                   <th scope="col">No</th>
                   <th scope="col">Name</th>
                   <th scope="col">Description</th>
-                  <th scope="col">Subcategory</th>
+                  <th scope="col">Sub Category</th>
                   <th scope="col">Status</th>
                   <th scope="col">Actions</th>
                 </tr>
@@ -52,8 +51,8 @@ const CategoryPage = () => {
                     <td>{category.description}</td>
                     <td>
                       <ul>
-                        {category.subcategories?.map((spec, index) => (
-                          <li key={index}>{spec}</li>
+                        {category.subcategories?.map((sub, index) => (
+                          <li key={index}>{sub}</li>
                         ))}
                       </ul>
                     </td>

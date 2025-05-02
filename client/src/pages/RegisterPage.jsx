@@ -32,9 +32,9 @@ const RegisterPage = () => {
   useEffect(() => {
     if (token) {
       navigate("/dashboard");
-
-      fetchRoles();
     }
+
+    fetchRoles();
   }, [navigate, token]);
 
 
