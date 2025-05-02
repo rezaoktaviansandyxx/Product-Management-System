@@ -9,6 +9,8 @@ import SupplierPage from './pages/dashboard/SupplierPage';
 import RolePage from './pages/dashboard/RolePage';
 import UserPage from './pages/dashboard/UserPage';
 
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <Router>
@@ -16,7 +18,14 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />}>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardContent />} />
           <Route path="products" element={<ProductPage />} />
           <Route path="categories" element={<CategoryPage />} />

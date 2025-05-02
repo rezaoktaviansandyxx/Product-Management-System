@@ -23,8 +23,13 @@ const RegisterPage = () => {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    }
+
     fetchRoles();
-  }, []);
+  });
 
   const [apiError, setApiError] = useState('');
   const [roles, setRoles] = useState([]);

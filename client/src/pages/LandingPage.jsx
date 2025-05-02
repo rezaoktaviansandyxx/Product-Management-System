@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../style/LandingPage.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import AppConfig from '../config/AppConfig';
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    const [user, setUser] = useState('');
+
+    useEffect(() => {
+        if (token) {
+            // Set authorization header
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // Fetch user data
+            fetchUser();
+        }
+    }, [navigate, token]);
+
+    const fetchUser = async () => {
+        const response = await axios.get(AppConfig.API_URL + '/me');
+        setUser(response.data);
+    };
 
     return (
         <div className="landing-wrapper">
@@ -14,8 +33,14 @@ const LandingPage = () => {
                     <span>ProductFlow</span>
                 </div>
                 <div className="navbar-buttons">
-                    <button onClick={() => navigate('/login')}>Login</button>
-                    <button onClick={() => navigate('/register')} className="register-btn">Register</button>
+                    {token ? (
+                        <h5 style={{fontWeight: 'bold'}}>Hi, {user.username} ({user.role_name})</h5>
+                    ) : (
+                        <>
+                            <button onClick={() => navigate('/login')}>Login</button>
+                            <button onClick={() => navigate('/register')} className="register-btn">Register</button>
+                        </>
+                    )}
                 </div>
             </nav>
 
@@ -29,8 +54,14 @@ const LandingPage = () => {
                         Collaborate, plan, and measure success — in one seamless platform.
                     </p>
                     <div className="hero-buttons">
-                        <button onClick={() => navigate('/login')} className="btn-primary">Get Started</button>
-                        <button onClick={() => navigate('/register')} className="btn-outline">Create Account</button>
+                        {token ? (
+                            <button onClick={() => navigate('/dashboard')} className="btn-primary">Dashboard</button>
+                        ) : (
+                            <>
+                                <button onClick={() => navigate('/login')} className="btn-primary">Get Started</button>
+                                <button onClick={() => navigate('/register')} className="btn-outline">Create Account</button>
+                            </>
+                        )}
                     </div>
                 </div>
                 <div className="hero-image">

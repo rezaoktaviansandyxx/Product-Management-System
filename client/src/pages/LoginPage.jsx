@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../style/Login.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -19,6 +19,13 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    }
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

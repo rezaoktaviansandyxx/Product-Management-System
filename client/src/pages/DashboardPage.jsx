@@ -1,7 +1,6 @@
 import React from 'react';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { Outlet } from 'react-router-dom';
-import '../style/DashboardPage.css';
 
 const DashboardPage = () => {
   return (
@@ -17,9 +16,9 @@ const DashboardPage = () => {
 // Komponen untuk konten dashboard utama
 export function DashboardContent() {
   return (
-    <div className="dashboard-overview">
+    <div>
       <h1>Dashboard Overview</h1>
-      <p>Welcome to the admin dashboard. Select a menu item to manage your data.</p>
+      <p>Welcome to the dashboard. Select a menu item to manage your data.</p>
     </div>
   );
 }

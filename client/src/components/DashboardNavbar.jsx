@@ -16,7 +16,7 @@ const DashboardNavbar = () => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
-  }, []);
+  });
 
   const handleLogout = async () => {
     await axios.post(AppConfig.API_URL + '/logout').then(() => {
@@ -43,7 +43,7 @@ const DashboardNavbar = () => {
   return (
     <nav className="dashboard-navbar">
       <div className="navbar-brand">
-        <h2>Admin Dashboard</h2>
+        <h2>ProductFlow</h2>
         <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
           {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
         </button>
