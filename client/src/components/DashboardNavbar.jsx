@@ -9,14 +9,26 @@ const DashboardNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [role, setRole] = useState(null);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     // Check if user is authenticated
-    const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
-  });
+
+    fetchUserRoles();
+  }, [token]);
+
+  const fetchUserRoles = async () => {
+    try {
+      const response = await axios.get(AppConfig.API_URL + '/me');
+      setRole(response.data.role_name);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleLogout = async () => {
     await axios.post(AppConfig.API_URL + '/logout').then(() => {
@@ -26,15 +38,20 @@ const DashboardNavbar = () => {
     });
   };
 
-  // Daftar menu navbar
-  const menuItems = [
+  // Daftar menu navbar (semua)
+  const allMenuItems = [
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/dashboard/products', label: 'Product' },
     { path: '/dashboard/categories', label: 'Category' },
     { path: '/dashboard/suppliers', label: 'Supplier' },
     { path: '/dashboard/roles', label: 'Role' },
-    { path: '/dashboard/users', label: 'User' },
+    { path: '/dashboard/users', label: 'User', onlyFor: 'Administrator' },
   ];
+
+  // Filter menu berdasarkan role
+  const menuItems = allMenuItems.filter(
+    (item) => !item.onlyFor || item.onlyFor === role
+  );
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
