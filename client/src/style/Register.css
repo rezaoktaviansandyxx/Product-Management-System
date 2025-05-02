@@ -134,6 +134,17 @@
     color: #333;
 }
 
+.error-input {
+    border: 1px solid #ff4444 !important;
+}
+
+.error-text {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+    display: block;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
     .register-card {

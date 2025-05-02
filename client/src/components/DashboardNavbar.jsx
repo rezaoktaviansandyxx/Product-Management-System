@@ -1,0 +1,73 @@
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import '../style/DashboardNavbar.css';
+import axios from 'axios';
+import AppConfig from '../config/AppConfig';
+import { FaBars, FaTimes } from 'react-icons/fa';
+
+const DashboardNavbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    await axios.post(AppConfig.API_URL + '/logout').then(() => {
+      localStorage.removeItem('token');
+      // Redirect ke halaman login
+      navigate('/login');
+    });
+  };
+
+  // Daftar menu navbar
+  const menuItems = [
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/dashboard/products', label: 'Products' },
+    { path: '/dashboard/categories', label: 'Categories' },
+    { path: '/dashboard/suppliers', label: 'Suppliers' },
+    { path: '/dashboard/roles', label: 'Roles' },
+    { path: '/dashboard/users', label: 'Users' },
+  ];
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  return (
+    <nav className="dashboard-navbar">
+      <div className="navbar-brand">
+        <h2>Admin Dashboard</h2>
+        <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
+          {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+      </div>
+      <div className={`navbar-right ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        <ul className="navbar-menu">
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              <Link
+                to={item.path}
+                className={location.pathname === item.path ? 'active' : ''}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </nav>
+  );
+};
+
+export default DashboardNavbar;

@@ -32,6 +32,7 @@ Route::get('/', function (Request $request) {
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/roles', [RoleController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -64,7 +65,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/{product}/attachments/{attachment}/download', [ProductAttachmentController::class, 'download']);
 
     // Roles
-    Route::apiResource('roles', RoleController::class);
+    Route::get('/roles/{role}', [RoleController::class, 'show']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::put('/roles/{role}', [RoleController::class, 'update']);
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
     Route::post('/roles/{role}/restore', [RoleController::class, 'restore'])
         ->withTrashed();
 });

@@ -1,15 +1,29 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage, { DashboardContent } from './pages/DashboardPage';
+import ProductPage from './pages/dashboard/ProductPage';
+import CategoryPage from './pages/dashboard/CategoryPage';
+import SupplierPage from './pages/dashboard/SupplierPage';
+import RolePage from './pages/dashboard/RolePage';
+import UserPage from './pages/dashboard/UserPage';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<DashboardPage />}>
+          <Route index element={<DashboardContent />} />
+          <Route path="products" element={<ProductPage />} />
+          <Route path="categories" element={<CategoryPage />} />
+          <Route path="suppliers" element={<SupplierPage />} />
+          <Route path="roles" element={<RolePage />} />
+          <Route path="users" element={<UserPage />} />
+        </Route>
       </Routes>
     </Router>
   );
