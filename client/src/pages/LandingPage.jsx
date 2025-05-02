@@ -12,9 +12,8 @@ const LandingPage = () => {
 
     useEffect(() => {
         if (token) {
-            // Set authorization header
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            // Fetch user data
+
             fetchUser();
         }
     }, [navigate, token]);
@@ -34,7 +33,7 @@ const LandingPage = () => {
                 </div>
                 <div className="navbar-buttons">
                     {token ? (
-                        <h5 style={{fontWeight: 'bold'}}>Hi, {user.username} ({user.role_name})</h5>
+                        <h5 style={{ fontWeight: 'bold' }}>Hi, {user.username} ({user.role_name})</h5>
                     ) : (
                         <>
                             <button onClick={() => navigate('/login')}>Login</button>

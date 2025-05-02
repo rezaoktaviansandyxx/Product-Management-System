@@ -18,14 +18,15 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       navigate("/dashboard");
     }
-  });
+  }, [navigate, token]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -92,11 +93,11 @@ const LoginPage = () => {
           // Handle server validation errors
           const serverErrors = err.response.data.errors;
           const newErrors = {};
-          
+
           Object.keys(serverErrors).forEach(key => {
             newErrors[key] = serverErrors[key][0];
           });
-          
+
           setErrors(newErrors);
         } else if (err.response.data.message) {
           setApiError(err.response.data.message);

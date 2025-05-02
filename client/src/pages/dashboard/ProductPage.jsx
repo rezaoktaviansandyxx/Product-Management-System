@@ -8,18 +8,17 @@ const ProductPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
 
-    fetchProducts();
+      fetchProducts();
+    }
   }, []);
 
   const fetchProducts = async () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/products');
       setProducts(response.data.data);
-      console.log(response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -28,61 +27,66 @@ const ProductPage = () => {
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Product List</h1>
-      <table className="table table-bordered table-striped">
-        <thead className="table-primary">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Specification</th>
-            <th>Supplier</th>
-            <th>Category</th>
-            <th>Price (Rp)</th>
-            <th>Stock</th>
-            <th>Attachment</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.length > 0 ? (
-            products.map((product, index) => (
-              <tr key={product.id}>
-                <td>{index + 1}</td>
-                <td>{product.name}</td>
-                <td>{product.description}</td>
-                <td>
-                  <ul>
-                    {product.specifications?.map((spec, index) => (
-                      <li key={index}>{spec}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>{product.supplier.name}</td>
-                <td>{product.category.name}</td>
-                <td>{parseFloat(product.price).toLocaleString('id-ID')}</td>
-                <td>{product.stock}</td>
-                <td>
-                  <ul>
-                    {product.attachments?.map((file, index) => (
-                      <li key={index}>{file.file_name}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>
-                  <div className="btn-group" role="group">
-                    <button className="btn btn-sm btn-primary">Edit</button>
-                    <button className="btn btn-sm btn-danger ms-2">Delete</button>
-                  </div>
-                </td>
+
+      <div className="card">
+        <div className="card-body">
+          <table className="table table-bordered table-striped">
+            <thead className="thead-dark">
+              <tr>
+                <th>No</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Specification</th>
+                <th>Supplier</th>
+                <th>Category</th>
+                <th>Price (Rp)</th>
+                <th>Stock</th>
+                <th>Attachment</th>
+                <th>Action</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center">No products available.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {products.length > 0 ? (
+                products.map((product, index) => (
+                  <tr key={product.id}>
+                    <td>{index + 1}</td>
+                    <td>{product.name}</td>
+                    <td>{product.description}</td>
+                    <td>
+                      <ul>
+                        {product.specifications?.map((spec, index) => (
+                          <li key={index}>{spec}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>{product.supplier.name}</td>
+                    <td>{product.category.name}</td>
+                    <td>{parseFloat(product.price).toLocaleString('id-ID')}</td>
+                    <td>{product.stock}</td>
+                    <td>
+                      <ul>
+                        {product.attachments?.map((file, index) => (
+                          <li key={index}>{file.file_name}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>
+                      <div className="btn-group" role="group">
+                        <button className="btn btn-sm btn-primary">Edit</button>
+                        <button className="btn btn-sm btn-danger ms-2">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" className="text-center">No products available.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

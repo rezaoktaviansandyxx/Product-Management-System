@@ -22,19 +22,22 @@ const RegisterPage = () => {
     role_name: ''
   });
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/dashboard");
-    }
-
-    fetchRoles();
-  });
-
   const [apiError, setApiError] = useState('');
   const [roles, setRoles] = useState([]);
   const [show, setShow] = useState({ password: false, confirm: false });
+
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token) {
+      navigate("/dashboard");
+
+      fetchRoles();
+    }
+  }, [navigate, token]);
+
+
 
   const fetchRoles = async () => {
     try {
