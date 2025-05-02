@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../style/Register.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import AppConfig from '../config/AppConfig';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +23,6 @@ const RegisterPage = () => {
     role_name: ''
   });
 
-  const [apiError, setApiError] = useState('');
   const [roles, setRoles] = useState([]);
   const [show, setShow] = useState({ password: false, confirm: false });
 
@@ -89,16 +89,13 @@ const RegisterPage = () => {
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-      isValid = false;
     }
 
     if (!formData.password_confirmation) {
       newErrors.password_confirmation = 'Please confirm your password';
       isValid = false;
     } else if (formData.password !== formData.password_confirmation) {
-      newErrors.password_confirmation = 'Passwords do not match';
+      newErrors.password_confirmation = 'Passwords does not match';
       isValid = false;
     }
 
@@ -132,13 +129,17 @@ const RegisterPage = () => {
         },
       });
 
-      navigate('/login');
+      Swal.fire({
+        icon: 'success',
+        title: 'Registration Successful!',
+        text: 'Please login with your credentials.',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        navigate('/login');
+      });
 
     } catch (error) {
-      console.error('Registration error:', error);
-
       if (error.response) {
-        // Handle server validation errors
         if (error.response.data.errors) {
           const serverErrors = error.response.data.errors;
           const newErrors = {};
@@ -149,13 +150,24 @@ const RegisterPage = () => {
 
           setErrors(newErrors);
         } else {
-          console.log(error.response.data.message || 'Registration failed. Please try again.');
-          setApiError(error.response.data.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Registration Failed',
+            text: error.response.data.message || 'Please try again.'
+          });
         }
       } else if (error.request) {
-        console.log('No response from server. Please check your network connection.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error',
+          text: 'No response from server. Please check your network connection.'
+        });
       } else {
-        console.log('Error: ' + error.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message
+        });
       }
     }
   };
@@ -165,11 +177,6 @@ const RegisterPage = () => {
       <div className="register-card">
         <h2 className="register-title">Create New Account</h2>
         <form onSubmit={handleSubmit} className="register-form" noValidate>
-          {apiError && (
-            <div className="alert alert-danger">
-              {apiError}
-            </div>
-          )}
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
