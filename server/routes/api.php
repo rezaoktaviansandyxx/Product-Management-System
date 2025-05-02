@@ -76,6 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'role:Administrator'])->group(function () {
     // Routes untuk admin
     Route::get('/users', function () {
-        return User::all();
+        return User::with('role')->get();
     });
 });

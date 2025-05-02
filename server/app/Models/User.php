@@ -49,6 +49,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = ['role_name'];
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -57,5 +59,10 @@ class User extends Authenticatable
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function getRoleNameAttribute()
+    {
+        return $this->role->name ?? null;
     }
 }
