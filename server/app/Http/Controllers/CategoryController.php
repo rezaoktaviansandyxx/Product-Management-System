@@ -43,7 +43,7 @@ class CategoryController extends Controller
         $category = Category::create([
             'name' => $request->name,
             'description' => $request->description,
-            'subcategories' => $request->subcategories,
+            'subcategories' => json_decode($request->subcategories, true) ?? [],
             'is_active' => $request->is_active ?? true
         ]);
 
