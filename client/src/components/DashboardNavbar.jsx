@@ -29,11 +29,11 @@ const DashboardNavbar = () => {
   // Daftar menu navbar
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard' },
-    { path: '/dashboard/products', label: 'Products' },
-    { path: '/dashboard/categories', label: 'Categories' },
-    { path: '/dashboard/suppliers', label: 'Suppliers' },
-    { path: '/dashboard/roles', label: 'Roles' },
-    { path: '/dashboard/users', label: 'Users' },
+    { path: '/dashboard/products', label: 'Product' },
+    { path: '/dashboard/categories', label: 'Category' },
+    { path: '/dashboard/suppliers', label: 'Supplier' },
+    { path: '/dashboard/roles', label: 'Role' },
+    { path: '/dashboard/users', label: 'User' },
   ];
 
   const toggleMobileMenu = () => {

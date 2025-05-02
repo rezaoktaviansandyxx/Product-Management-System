@@ -1,0 +1,41 @@
+.dashboard-content-container {
+    padding: 20px;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.dashboard-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 24px;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.stat-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2d87f0;
+    /* Blue for the value */
+}

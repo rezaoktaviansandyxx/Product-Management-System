@@ -1,6 +1,7 @@
 import React from 'react';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { Outlet } from 'react-router-dom';
+import '../style/DashboardContent.css';
 
 const DashboardPage = () => {
   return (
@@ -13,12 +14,28 @@ const DashboardPage = () => {
   );
 };
 
-// Komponen untuk konten dashboard utama
 export function DashboardContent() {
   return (
-    <div>
-      <h1>Dashboard Overview</h1>
-      <p>Welcome to the dashboard. Select a menu item to manage your data.</p>
+    <div className="dashboard-content-container">
+      <h1 className="dashboard-title">Dashboard Overview</h1>
+      <p className="dashboard-description">
+        Selamat datang di dashboard. Gunakan menu di atas untuk mengelola data Anda seperti produk, pengguna, atau laporan.
+      </p>
+
+      <div className="stats-container">
+        <div className="stat-card">
+          <h2 className="stat-title">Total Produk</h2>
+          <p className="stat-value">123</p>
+        </div>
+        <div className="stat-card">
+          <h2 className="stat-title">Pengguna Aktif</h2>
+          <p className="stat-value">58</p>
+        </div>
+        <div className="stat-card">
+          <h2 className="stat-title">Laporan Hari Ini</h2>
+          <p className="stat-value">9</p>
+        </div>
+      </div>
     </div>
   );
 }
