@@ -1,9 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import AppConfig from '../../config/AppConfig';
+import React, { useEffect, useState } from 'react';
+import AppConfig from '../../../config/AppConfig';
 import Swal from 'sweetalert2';
 
-const AddCategory = ({ onSuccess, onClose }) => {
+const EditCategory = ({ category, onSuccess, onClose }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -21,7 +21,19 @@ const AddCategory = ({ onSuccess, onClose }) => {
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
-    }, [token]);
+
+        // Set initial form data when category prop changes
+        if (category) {
+            const categoryData = category.metadata ? JSON.parse(category.metadata) : {};
+            setFormData({
+                name: category.name || '',
+                description: category.description || '',
+                notes: categoryData.notes || '',
+                tags: categoryData.tags || '',
+                is_active: category.is_active || true
+            });
+        }
+    }, [token, category]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -30,7 +42,7 @@ const AddCategory = ({ onSuccess, onClose }) => {
             [name]: name === 'is_active' ? value === 'true' : value,
         }));
 
-        // Hapus error saat user mengetik
+        // Clear error when user types
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
@@ -64,31 +76,22 @@ const AddCategory = ({ onSuccess, onClose }) => {
 
         setLoading(true);
 
-        axios.post(AppConfig.API_URL + '/categories', categoryData)
+        axios.put(`${AppConfig.API_URL}/categories/${category.id}`, categoryData)
             .then((response) => {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'Category has been added successfully.',
+                    text: 'Category has been updated successfully.',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
                     onSuccess();
                     onClose();
                 });
-
-                // Reset form
-                setFormData({
-                    name: '',
-                    description: '',
-                    notes: '',
-                    tags: '',
-                    is_active: true
-                });
             })
             .catch((error) => {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Something went wrong while saving the category.',
+                    text: error.response?.data?.message || 'Something went wrong while updating the category.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
@@ -152,18 +155,23 @@ const AddCategory = ({ onSuccess, onClose }) => {
                     <option value="false">Inactive</option>
                 </select>
             </div>
-            <button type="submit" className="btn btn-success" disabled={loading}>
-                {loading ? (
-                    <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Loading...
-                    </>
-                ) : (
-                    'Submit'
-                )}
-            </button>
+            <div className="d-flex justify-content-end gap-2">
+                <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>
+                    Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                    {loading ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Updating...
+                        </>
+                    ) : (
+                        'Update'
+                    )}
+                </button>
+            </div>
         </form>
     );
 };
 
-export default AddCategory;
+export default EditCategory;

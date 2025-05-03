@@ -1,11 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import AppConfig from '../../config/AppConfig';
-import AddSupplier from '../../components/form/AddSupplier';
+import AddSupplier from '../../components/form/supplier/AddSupplier';
+import EditSupplier from '../../components/form/supplier/EditSupplier';
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -31,6 +34,16 @@ const SupplierPage = () => {
 
   const handleCloseModal = () => {
     setShowAddModal(false);
+  };
+
+  const handleEditSupplier = (supplier) => {
+    setSelectedSupplier(supplier);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedSupplier(null);
   };
 
   return (
@@ -80,7 +93,12 @@ const SupplierPage = () => {
                           </span>
                         </td>
                         <td>
-                          <button className="btn btn-sm btn-info me-2">Edit</button>
+                          <button
+                            className="btn btn-sm btn-info me-2"
+                            onClick={() => handleEditSupplier(supplier)}
+                          >
+                            Edit
+                          </button>
                           <button className="btn btn-sm btn-danger">Delete</button>
                         </td>
                       </tr>
@@ -114,6 +132,29 @@ const SupplierPage = () => {
                     setShowAddModal(false); // Tutup modal
                   }}
                   onClose={handleCloseModal}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && selectedSupplier && (
+        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Supplier</h5>
+                <button type="button" className="btn-close" onClick={handleCloseEditModal}></button>
+              </div>
+              <div className="modal-body">
+                <EditSupplier
+                  supplier={selectedSupplier}
+                  onSuccess={() => {
+                    fetchSuppliers();  // Refresh list
+                    handleCloseEditModal(); // Tutup modal
+                  }}
+                  onClose={handleCloseEditModal}
                 />
               </div>
             </div>

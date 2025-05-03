@@ -85,7 +85,7 @@ class SupplierController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'contact_info' => 'sometimes|required|json',
+            'contact_info' => 'sometimes|required',
             'is_active' => 'sometimes|boolean'
         ]);
 

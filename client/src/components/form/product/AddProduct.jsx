@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import AppConfig from '../../config/AppConfig';
+import AppConfig from '../../../config/AppConfig';
 
 const AddProduct = ({ onSuccess, onClose }) => {
     const [formData, setFormData] = useState({

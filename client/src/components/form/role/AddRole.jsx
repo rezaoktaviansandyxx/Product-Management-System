@@ -1,14 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import AppConfig from '../../config/AppConfig';
+import React, { useEffect, useState } from 'react';
+import AppConfig from '../../../config/AppConfig';
 import Swal from 'sweetalert2';
 
-
-const AddSupplier = ({ onSuccess, onClose }) => {
+const AddRole = ({ onSuccess, onClose }) => {
     const [formData, setFormData] = useState({
         name: '',
-        address: '',
-        phone: '',
         is_active: true
     });
 
@@ -35,30 +32,16 @@ const AddSupplier = ({ onSuccess, onClose }) => {
             setErrors((prev) => ({
                 ...prev,
                 [name]: ''
-
             }));
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newErrors = {};
 
+        const newErrors = {};
         if (!formData.name.trim()) {
             newErrors.name = "Name is required.";
-        }
-
-        if (!formData.address.trim()) {
-            newErrors.address = "Address is required.";
-        }
-
-        if (!formData.phone.trim()) {
-            newErrors.phone = "Phone is required.";
-        } else {
-            const phoneRegex = /^(?:\+62|62|0)8[1-9][0-9]{7,10}$/;
-            if (!phoneRegex.test(formData.phone)) {
-                newErrors.phone = "Phone number is invalid.";
-            }
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -66,22 +49,18 @@ const AddSupplier = ({ onSuccess, onClose }) => {
             return;
         }
 
-        const supplierData = {
+        const roleData = {
             name: formData.name,
-            contact_info: {
-                address: formData.address,
-                phone: formData.phone,
-            },
             is_active: formData.is_active,
         };
 
         setLoading(true);
 
-        axios.post(AppConfig.API_URL + '/suppliers', supplierData)
+        axios.post(AppConfig.API_URL + '/roles', roleData)
             .then((response) => {
                 Swal.fire({
                     title: 'Success!',
-                    text: 'Supplier has been added successfully.',
+                    text: 'Role has been added successfully.',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -92,15 +71,13 @@ const AddSupplier = ({ onSuccess, onClose }) => {
                 // Reset form
                 setFormData({
                     name: '',
-                    address: '',
-                    phone: '',
                     is_active: true
                 });
             })
             .catch((error) => {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Something went wrong while saving the supplier.',
+                    text: 'Something went wrong while saving the role.',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
@@ -122,28 +99,6 @@ const AddSupplier = ({ onSuccess, onClose }) => {
                     onChange={handleChange}
                 />
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Address</label>
-                <input
-                    type="text"
-                    name="address"
-                    className={`form-control ${errors.address ? 'is-invalid' : ''}`}
-                    value={formData.address}
-                    onChange={handleChange}
-                />
-                {errors.address && <div className="invalid-feedback">{errors.address}</div>}
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Phone</label>
-                <input
-                    type="text"
-                    name="phone"
-                    className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
-                    value={formData.phone}
-                    onChange={handleChange}
-                />
-                {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
             </div>
             <div className="mb-3">
                 <label className="form-label">Status</label>
@@ -169,6 +124,6 @@ const AddSupplier = ({ onSuccess, onClose }) => {
             </button>
         </form>
     );
-}
+};
 
-export default AddSupplier
+export default AddRole;

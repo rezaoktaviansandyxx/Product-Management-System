@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import AppConfig from '../../config/AppConfig';
-import AddCategory from '../../components/form/AddCategory';
+import AddCategory from '../../components/form/category/AddCategory';
+import EditCategory from '../../components/form/category/EditCategory';
 
 const CategoryPage = () => {
 
   const [categories, setCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -35,6 +38,11 @@ const CategoryPage = () => {
     setShowAddModal(false);
   };
 
+  const handleEditCategory = (category) => {
+    setSelectedCategory(category);
+    setShowEditModal(true);
+  };
+
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Category List</h1>
@@ -54,42 +62,47 @@ const CategoryPage = () => {
                   <th scope="col">No</th>
                   <th scope="col">Name</th>
                   <th scope="col">Description</th>
-                  <th scope="col">Note</th>
-                  <th scope="col">Tag</th>
+                  <th scope="col">Attribute</th>
                   <th scope="col">Status</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.length > 0 ? (
-                  categories.map((category, index) => {
-                    const parsedMetadata = (() => {
-                      try {
-                        return JSON.parse(category.metadata || '{}');
-                      } catch {
-                        return {};
-                      }
-                    })();
-
-                    return (
-                      <tr key={category.id}>
-                        <th scope="row">{index + 1}</th>
-                        <td>{category.name}</td>
-                        <td>{category.description || '-'}</td>
-                        <td>{parsedMetadata.notes || '-'}</td>
-                        <td>{parsedMetadata.tags || '-'}</td>
-                        <td>
-                          <span className={`badge ${category.is_active ? 'bg-success' : 'bg-secondary'}`}>
-                            {category.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                        <td>
-                          <button className="btn btn-sm btn-info me-2">Edit</button>
-                          <button className="btn btn-sm btn-danger">Delete</button>
-                        </td>
-                      </tr>
-                    );
-                  })
+                  categories.map((category, index) => (
+                    <tr key={category.id}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{category.name}</td>
+                      <td>{category.description || '-'}</td>
+                      <td>
+                        <ul className="mb-0">
+                          {category.metadata && (() => {
+                            const categoryData = JSON.parse(category.metadata);
+                            return (
+                              <>
+                                {categoryData.notes && <li>Note : {categoryData.notes}</li>}
+                                {categoryData.tags && <li>Tag : {categoryData.tags}</li>}
+                              </>
+                            );
+                          })()}
+                        </ul>
+                      </td>
+                      <td>
+                        <span className={`badge ${category.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                          {category.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-info me-2"
+                          onClick={() => handleEditCategory(category)}
+                        >
+                          Edit
+                        </button>
+                        <button className="btn btn-sm btn-danger">Delete</button>
+                      </td>
+                    </tr>
+                  ))
                 ) : (
                   <tr>
                     <td colSpan="7" className="text-center">No categories found</td>
@@ -117,6 +130,29 @@ const CategoryPage = () => {
                     setShowAddModal(false); // Tutup modal
                   }}
                   onClose={handleCloseModal}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && selectedCategory && (
+        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Category</h5>
+                <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <EditCategory
+                  category={selectedCategory}
+                  onSuccess={() => {
+                    fetchCategories();  // Refresh list
+                    setShowEditModal(false); // Close modal
+                  }}
+                  onClose={() => setShowEditModal(false)}
                 />
               </div>
             </div>

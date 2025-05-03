@@ -1,12 +1,15 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import AppConfig from '../../config/AppConfig';
-import AddProduct from '../../components/form/AddProduct';
+import AddProduct from '../../components/form/product/AddProduct';
+import EditProduct from '../../components/form/product/EditProduct';
 
 const ProductPage = () => {
 
   const [products, setProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -21,7 +24,6 @@ const ProductPage = () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/products');
       setProducts(response.data.data);
-      console.log("Products fetched:", response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -33,6 +35,16 @@ const ProductPage = () => {
 
   const handleCloseModal = () => {
     setShowAddModal(false);
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -77,7 +89,7 @@ const ProductPage = () => {
                             return (
                               <>
                                 {specs.serial_number && <li>Serial Number : {specs.serial_number}</li>}
-                                {specs.tags && <li>Tags : {specs.tags}</li>}
+                                {specs.tags && <li>Tag : {specs.tags}</li>}
                               </>
                             );
                           })()}
@@ -96,7 +108,12 @@ const ProductPage = () => {
                       </td>
                       <td>
                         <div className="btn-group" role="group">
-                          <button className="btn btn-sm btn-primary">Edit</button>
+                          <button
+                            className="btn btn-sm btn-primary"
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            Edit
+                          </button>
                           <button className="btn btn-sm btn-danger ms-2">Delete</button>
                         </div>
                       </td>
@@ -129,6 +146,29 @@ const ProductPage = () => {
                     setShowAddModal(false); // Tutup modal
                   }}
                   onClose={handleCloseModal}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && selectedProduct && (
+        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Product</h5>
+                <button type="button" className="btn-close" onClick={handleCloseEditModal}></button>
+              </div>
+              <div className="modal-body">
+                <EditProduct
+                  product={selectedProduct}
+                  onSuccess={() => {
+                    fetchProducts();  // Refresh list
+                    handleCloseEditModal(); // Tutup modal
+                  }}
+                  onClose={handleCloseEditModal}
                 />
               </div>
             </div>
