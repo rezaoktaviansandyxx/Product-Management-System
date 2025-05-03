@@ -75,7 +75,7 @@ const CategoryPage = () => {
                       <tr key={category.id}>
                         <th scope="row">{index + 1}</th>
                         <td>{category.name}</td>
-                        <td>{category.description}</td>
+                        <td>{category.description || '-'}</td>
                         <td>{parsedMetadata.notes || '-'}</td>
                         <td>{parsedMetadata.tags || '-'}</td>
                         <td>
