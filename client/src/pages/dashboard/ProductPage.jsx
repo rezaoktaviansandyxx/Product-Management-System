@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AppConfig from '../../config/AppConfig';
 import AddProduct from '../../components/form/product/AddProduct';
 import EditProduct from '../../components/form/product/EditProduct';
+import Swal from 'sweetalert2';
 
 const ProductPage = () => {
 
@@ -27,6 +28,40 @@ const ProductPage = () => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleDeleteProduct = (product) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete "${product.name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`${AppConfig.API_URL}/products/${product.id}`);
+
+          Swal.fire(
+            'Deleted!',
+            'Your product has been deleted.',
+            'success'
+          );
+
+          // Refresh product list
+          fetchProducts();
+        } catch (error) {
+          console.error(error);
+          Swal.fire(
+            'Error!',
+            'Failed to delete product.',
+            'error'
+          );
+        }
+      }
+    });
   };
 
   const handleAddCategory = () => {
@@ -72,6 +107,7 @@ const ProductPage = () => {
                   <th>Price (Rp)</th>
                   <th>Stock</th>
                   <th>Attachment</th>
+                  <th>Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -95,8 +131,8 @@ const ProductPage = () => {
                           })()}
                         </ul>
                       </td>
-                      <td>{product.supplier.name}</td>
-                      <td>{product.category.name}</td>
+                      <td>{product.supplier ? product.supplier.name : '-'}</td>
+                      <td>{product.category ? product.category.name : '-'}</td>
                       <td>{parseFloat(product.price).toLocaleString('id-ID')}</td>
                       <td>{product.stock}</td>
                       <td>
@@ -107,6 +143,11 @@ const ProductPage = () => {
                         </ul>
                       </td>
                       <td>
+                        <span className={`badge ${product.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                          {product.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>
                         <div className="btn-group" role="group">
                           <button
                             className="btn btn-sm btn-primary"
@@ -114,7 +155,12 @@ const ProductPage = () => {
                           >
                             Edit
                           </button>
-                          <button className="btn btn-sm btn-danger ms-2">Delete</button>
+                          <button
+                            className="btn btn-sm btn-danger ms-2"
+                            onClick={() => handleDeleteProduct(product)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>

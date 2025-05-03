@@ -54,6 +54,9 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
         // Set initial form data when product prop changes
         if (product) {
             const specs = product.specifications ? JSON.parse(product.specifications) : {};
+
+            // Hapus koma dan angka di belakang koma dari price
+            const sanitizedPrice = product.price.replace(/,/g, '').split('.')[0]; // Menghapus koma dan angka setelah titik
             setFormData({
                 name: product.name,
                 description: product.description,
@@ -61,7 +64,7 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
                 tags: specs.tags || '',
                 supplier_id: product.supplier?.id || '',
                 category_id: product.category?.id || '',
-                price: product.price,
+                price: sanitizedPrice,
                 stock: product.stock,
                 newAttachment: null,
                 existingAttachment: product.attachments?.[0] || null,
@@ -85,10 +88,20 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
     // Handle input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: name === 'is_active' ? value === 'true' : value,
-        }));
+
+        // Untuk price, hilangkan koma sebelum update
+        if (name === 'price') {
+            const sanitizedPrice = value.replace(/,/g, ''); // Menghapus koma
+            setFormData((prev) => ({
+                ...prev,
+                [name]: sanitizedPrice
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: name === 'is_active' ? value === 'true' : value,
+            }));
+        }
 
         if (errors[name]) {
             setErrors((prev) => ({
@@ -159,12 +172,14 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
         e.preventDefault();
         if (loading) return;
 
-        // Validate form
+        // Pastikan harga berupa angka tanpa koma
+        const sanitizedPrice = formData.price.replace(/,/g, '');
+
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Name is required.";
         if (!formData.supplier_id) newErrors.supplier_id = "Supplier is required.";
         if (!formData.category_id) newErrors.category_id = "Category is required.";
-        if (!formData.price || isNaN(formData.price)) newErrors.price = "Valid price is required.";
+        if (!sanitizedPrice || isNaN(sanitizedPrice)) newErrors.price = "Valid price is required.";
         if (!formData.stock || isNaN(formData.stock)) newErrors.stock = "Valid stock is required.";
 
         if (Object.keys(newErrors).length > 0) {
@@ -176,6 +191,7 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
 
         try {
             // 1. Prepare product data
+            // Prepare product data dengan harga yang sudah dibersihkan
             const productData = {
                 name: formData.name,
                 description: formData.description,
@@ -185,7 +201,7 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
                 },
                 supplier_id: formData.supplier_id,
                 category_id: formData.category_id,
-                price: formData.price,
+                price: sanitizedPrice,
                 stock: formData.stock,
                 is_active: formData.is_active,
             };

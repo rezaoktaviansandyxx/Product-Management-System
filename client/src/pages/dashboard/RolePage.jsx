@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AppConfig from '../../config/AppConfig';
 import AddRole from '../../components/form/role/AddRole';
 import EditRole from '../../components/form/role/EditRole';
+import Swal from 'sweetalert2';
 
 const RolePage = () => {
 
@@ -47,6 +48,36 @@ const RolePage = () => {
         setSelectedRole(null);
     };
 
+    const handleDeleteRole = async (role) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to delete "${role.name}". This action cannot be undone!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(AppConfig.API_URL + `/roles/${role.id}`);
+                Swal.fire(
+                    'Deleted!',
+                    'The role has been deleted.',
+                    'success'
+                );
+                fetchRoles();
+            } catch (err) {
+                Swal.fire(
+                    'Error!',
+                    'Failed to delete role.',
+                    'error'
+                );
+            }
+        }
+    };
+
     return (
         <div className="container mt-4">
             <h1 className="mb-4">Role List</h1>
@@ -87,7 +118,12 @@ const RolePage = () => {
                                                 >
                                                     Edit
                                                 </button>
-                                                <button className="btn btn-sm btn-danger">Delete</button>
+                                                <button
+                                                    className="btn btn-sm btn-danger"
+                                                    onClick={() => handleDeleteRole(role)} // Panggil fungsi delete
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))

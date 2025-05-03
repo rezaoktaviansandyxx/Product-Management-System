@@ -78,4 +78,9 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])->group(function () {
     Route::get('/users', function () {
         return User::with('role')->get();
     });
+
+    Route::post('/users', [AuthController::class, 'createUser']);
+    Route::put('/users/{user}', [AuthController::class, 'updateUser']);
+    Route::delete('/users/{user}', [AuthController::class, 'deleteUser']);
+    Route::post('/users/{user}/restore', [AuthController::class, 'restoreUser'])->withTrashed();
 });

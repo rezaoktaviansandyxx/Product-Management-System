@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AppConfig from '../../config/AppConfig';
 import AddSupplier from '../../components/form/supplier/AddSupplier';
 import EditSupplier from '../../components/form/supplier/EditSupplier';
+import Swal from 'sweetalert2';
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -44,6 +45,36 @@ const SupplierPage = () => {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setSelectedSupplier(null);
+  };
+
+  const handleDeleteSupplier = async (supplier) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete "${supplier.name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(AppConfig.API_URL + `/suppliers/${supplier.id}`);
+        Swal.fire(
+          'Deleted!',
+          'The supplier has been deleted.',
+          'success'
+        );
+        fetchSuppliers();
+      } catch (err) {
+        Swal.fire(
+          'Error!',
+          'Failed to delete supplier.',
+          'error'
+        );
+      }
+    }
   };
 
   return (
@@ -99,7 +130,12 @@ const SupplierPage = () => {
                           >
                             Edit
                           </button>
-                          <button className="btn btn-sm btn-danger">Delete</button>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => handleDeleteSupplier(supplier)}
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     );

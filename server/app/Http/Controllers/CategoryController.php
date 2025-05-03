@@ -111,7 +111,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        $category->delete_by = auth()->user()->id;
+        $category->deleted_by = auth()->user()->id;
         $category->save();
 
         return response()->json([

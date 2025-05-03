@@ -22,6 +22,7 @@ const AddProduct = ({ onSuccess, onClose }) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
+    const [filePreview, setFilePreview] = useState(null);
 
     const token = localStorage.getItem("token");
 
@@ -64,7 +65,14 @@ const AddProduct = ({ onSuccess, onClose }) => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
 
-        if (!file) return;
+        if (!file) {
+            setFormData(prev => ({
+                ...prev,
+                attachments: null,
+            }));
+            setFilePreview(null);
+            return;
+        }
 
         // Validasi tipe file
         if (file.type !== 'application/pdf') {
@@ -76,6 +84,7 @@ const AddProduct = ({ onSuccess, onClose }) => {
                 ...prev,
                 attachments: null,
             }));
+            setFilePreview(null);
             return;
         }
 
@@ -90,6 +99,7 @@ const AddProduct = ({ onSuccess, onClose }) => {
                 ...prev,
                 attachments: null,
             }));
+            setFilePreview(null);
             return;
         }
 
@@ -103,6 +113,8 @@ const AddProduct = ({ onSuccess, onClose }) => {
             ...prev,
             attachments: file,
         }));
+
+        setFilePreview(file.name);
     };
 
     const handleSubmit = async (e) => {
@@ -185,8 +197,9 @@ const AddProduct = ({ onSuccess, onClose }) => {
 
     return (
         <form onSubmit={handleSubmit} encType="multipart/form-data">
+            {/* Product Name */}
             <div className="mb-3">
-                <label className="form-label">Name</label>
+                <label className="form-label">Name <span className="text-danger">*</span></label>
                 <input
                     type="text"
                     name="name"
@@ -197,90 +210,161 @@ const AddProduct = ({ onSuccess, onClose }) => {
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
 
+            {/* Description */}
             <div className="mb-3">
                 <label className="form-label">Description</label>
-                <textarea name="description" className="form-control" value={formData.description} onChange={handleChange} />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Serial Number</label>
-                <input name="serial_number" className="form-control" value={formData.serial_number} onChange={handleChange} />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Tags</label>
-                <input name="tags" className="form-control" value={formData.tags} onChange={handleChange} />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Supplier</label>
-                <select name="supplier_id" className={`form-control ${errors.supplier_id ? 'is-invalid' : ''}`} value={formData.supplier_id} onChange={handleChange}>
-                    <option value="">-- Select Supplier --</option>
-                    {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
-                </select>
-                {errors.supplier_id && <div className="invalid-feedback">{errors.supplier_id}</div>}
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Category</label>
-                <select name="category_id" className={`form-control ${errors.category_id ? 'is-invalid' : ''}`} value={formData.category_id} onChange={handleChange}>
-                    <option value="">-- Select Category --</option>
-                    {categories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                </select>
-                {errors.category_id && <div className="invalid-feedback">{errors.category_id}</div>}
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Price</label>
-                <input
-                    type="number"
-                    name="price"
-                    className={`form-control ${errors.price ? 'is-invalid' : ''}`}
-                    value={formData.price}
+                <textarea
+                    name="description"
+                    className="form-control"
+                    rows="3"
+                    value={formData.description}
                     onChange={handleChange}
                 />
-                {errors.price && <div className="invalid-feedback">{errors.price}</div>}
             </div>
 
-            <div className="mb-3">
-                <label className="form-label">Stock</label>
-                <input
-                    type="number"
-                    name="stock"
-                    className={`form-control ${errors.stock ? 'is-invalid' : ''}`}
-                    value={formData.stock}
-                    onChange={handleChange}
-                />
-                {errors.stock && <div className="invalid-feedback">{errors.stock}</div>}
+            {/* Specifications */}
+            <div className="row mb-3">
+                <div className="col-md-6">
+                    <label className="form-label">Serial Number</label>
+                    <input
+                        type="text"
+                        name="serial_number"
+                        className="form-control"
+                        value={formData.serial_number}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label className="form-label">Tags</label>
+                    <input
+                        type="text"
+                        name="tags"
+                        className="form-control"
+                        value={formData.tags}
+                        onChange={handleChange}
+                    />
+                </div>
             </div>
 
+            {/* Supplier and Category */}
+            <div className="row mb-3">
+                <div className="col-md-6">
+                    <label className="form-label">Supplier <span className="text-danger">*</span></label>
+                    <select
+                        name="supplier_id"
+                        className={`form-control ${errors.supplier_id ? 'is-invalid' : ''}`}
+                        value={formData.supplier_id}
+                        onChange={handleChange}
+                    >
+                        <option value="">-- Select Supplier --</option>
+                        {suppliers.map((supplier) => (
+                            <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                        ))}
+                    </select>
+                    {errors.supplier_id && <div className="invalid-feedback">{errors.supplier_id}</div>}
+                </div>
+                <div className="col-md-6">
+                    <label className="form-label">Category <span className="text-danger">*</span></label>
+                    <select
+                        name="category_id"
+                        className={`form-control ${errors.category_id ? 'is-invalid' : ''}`}
+                        value={formData.category_id}
+                        onChange={handleChange}
+                    >
+                        <option value="">-- Select Category --</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                    </select>
+                    {errors.category_id && <div className="invalid-feedback">{errors.category_id}</div>}
+                </div>
+            </div>
+
+            {/* Price and Stock */}
+            <div className="row mb-3">
+                <div className="col-md-6">
+                    <label className="form-label">Price (Rp) <span className="text-danger">*</span></label>
+                    <input
+                        type="number"
+                        name="price"
+                        className={`form-control ${errors.price ? 'is-invalid' : ''}`}
+                        value={formData.price}
+                        onChange={handleChange}
+                    />
+                    {errors.price && <div className="invalid-feedback">{errors.price}</div>}
+                </div>
+                <div className="col-md-6">
+                    <label className="form-label">Stock <span className="text-danger">*</span></label>
+                    <input
+                        type="number"
+                        name="stock"
+                        className={`form-control ${errors.stock ? 'is-invalid' : ''}`}
+                        value={formData.stock}
+                        onChange={handleChange}
+                    />
+                    {errors.stock && <div className="invalid-feedback">{errors.stock}</div>}
+                </div>
+            </div>
+
+            {/* Attachment */}
             <div className="mb-3">
-                <label className="form-label">Attachments</label>
+                <label className="form-label">Attachment</label>
                 <input
                     type="file"
                     name="attachments"
-                    className="form-control"
+                    className={`form-control ${errors.attachments ? 'is-invalid' : ''}`}
                     accept="application/pdf"
                     onChange={handleFileChange}
                 />
-                {errors.attachments && <div className="text-danger">{errors.attachments}</div>}
+                {filePreview && (
+                    <div className="mt-2 text-success">
+                        <i className="bi bi-check-circle-fill me-2"></i>
+                        Selected file: {filePreview}
+                    </div>
+                )}
+                {errors.attachments && <div className="invalid-feedback">{errors.attachments}</div>}
+                <small className="text-muted">PDF only (100KB-500KB)</small>
             </div>
 
-            <div className="mb-3">
+            {/* Status */}
+            <div className="mb-4">
                 <label className="form-label">Status</label>
-                <select name="is_active" className="form-control" value={formData.is_active.toString()} onChange={handleChange}>
+                <select
+                    name="is_active"
+                    className="form-control"
+                    value={formData.is_active.toString()}
+                    onChange={handleChange}
+                >
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
                 </select>
             </div>
 
-            <button type="submit" className="btn btn-success" disabled={loading || !isFormValid}>
-                {loading ? <><span className="spinner-border spinner-border-sm me-2" />Loading...</> : 'Submit'}
-            </button>
+            {/* Form Actions */}
+            <div className="d-flex justify-content-end gap-2">
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={onClose}
+                    disabled={loading}
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={loading || !isFormValid}
+                >
+                    {loading ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Creating...
+                        </>
+                    ) : (
+                        'Create'
+                    )}
+                </button>
+            </div>
         </form>
     );
 };

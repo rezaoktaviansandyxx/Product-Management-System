@@ -4,6 +4,7 @@ import axios from 'axios';
 import AppConfig from '../../config/AppConfig';
 import AddCategory from '../../components/form/category/AddCategory';
 import EditCategory from '../../components/form/category/EditCategory';
+import Swal from 'sweetalert2';
 
 const CategoryPage = () => {
 
@@ -41,6 +42,36 @@ const CategoryPage = () => {
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
     setShowEditModal(true);
+  };
+
+  const handleDeleteCategory = async (category) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete "${category.name}". This action cannot be undone!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(AppConfig.API_URL + `/categories/${category.id}`);
+        Swal.fire(
+          'Deleted!',
+          'Your category has been deleted.',
+          'success'
+        );
+        fetchCategories();
+      } catch (err) {
+        Swal.fire(
+          'Error!',
+          'Failed to delete category.',
+          'error'
+        );
+      }
+    }
   };
 
   return (
@@ -99,7 +130,12 @@ const CategoryPage = () => {
                         >
                           Edit
                         </button>
-                        <button className="btn btn-sm btn-danger">Delete</button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteCategory(category)}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))

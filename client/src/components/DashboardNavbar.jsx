@@ -4,6 +4,7 @@ import '../style/DashboardNavbar.css';
 import axios from 'axios';
 import AppConfig from '../config/AppConfig';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const DashboardNavbar = () => {
   const location = useLocation();
@@ -31,11 +32,37 @@ const DashboardNavbar = () => {
   };
 
   const handleLogout = async () => {
-    await axios.post(AppConfig.API_URL + '/logout').then(() => {
-      localStorage.removeItem('token');
-      // Redirect ke halaman login
-      navigate('/login');
+    const result = await Swal.fire({
+      title: 'Are you sure you want to log out?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, log out!',
+      cancelButtonText: 'Cancel'
     });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.post(AppConfig.API_URL + '/logout');
+        localStorage.removeItem('token');
+
+        Swal.fire({
+          title: 'Logout successful!',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        navigate('/login');
+      } catch (error) {
+        Swal.fire({
+          title: 'Logout failed!',
+          text: error.message,
+          icon: 'error'
+        });
+      }
+    }
   };
 
   // Daftar menu navbar (semua)

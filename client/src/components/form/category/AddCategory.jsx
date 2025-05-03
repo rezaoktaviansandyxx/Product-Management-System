@@ -101,7 +101,9 @@ const AddCategory = ({ onSuccess, onClose }) => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-3">
-                <label className="form-label">Name</label>
+                <label className="form-label">
+                    Name <span className="text-danger">*</span>
+                </label>
                 <input
                     type="text"
                     name="name"
@@ -152,16 +154,21 @@ const AddCategory = ({ onSuccess, onClose }) => {
                     <option value="false">Inactive</option>
                 </select>
             </div>
-            <button type="submit" className="btn btn-success" disabled={loading}>
-                {loading ? (
-                    <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Loading...
-                    </>
-                ) : (
-                    'Submit'
-                )}
-            </button>
+            <div className="d-flex justify-content-end gap-2">
+                <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>
+                    Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                    {loading ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Creating...
+                        </>
+                    ) : (
+                        'Create'
+                    )}
+                </button>
+            </div>
         </form>
     );
 };
