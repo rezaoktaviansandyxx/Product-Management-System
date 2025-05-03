@@ -13,7 +13,7 @@ class Category extends Model
     use HasFactory, SoftDeletes, UsesUuid, Auditable;
 
     protected $fillable = [
-        'name', 'description', 'subcategories', 'is_active'
+        'name', 'description', 'metadata', 'is_active'
     ];
 
     protected $casts = [

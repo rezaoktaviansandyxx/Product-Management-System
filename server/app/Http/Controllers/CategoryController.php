@@ -32,7 +32,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'subcategories' => 'nullable|json',
+            'metadata' => 'nullable',
             'is_active' => 'boolean'
         ]);
 
@@ -40,10 +40,15 @@ class CategoryController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $metadata = $request->metadata;
+        if (is_array($metadata)) {
+            $metadata = json_encode($metadata);
+        }
+
         $category = Category::create([
             'name' => $request->name,
             'description' => $request->description,
-            'subcategories' => json_decode($request->subcategories, true) ?? [],
+            'metadata' => $metadata,
             'is_active' => $request->is_active ?? true
         ]);
 
@@ -70,7 +75,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'subcategories' => 'nullable|json',
+            'metadata' => 'nullable',
             'is_active' => 'sometimes|boolean'
         ]);
 
@@ -78,13 +83,25 @@ class CategoryController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        // Prepare data for update
+        $updateData = $request->only(['name', 'description', 'is_active']);
+
+        // Handle metadata update
+        if ($request->has('metadata')) {
+            $metadata = $request->metadata;
+            if (is_array($metadata)) {
+                $metadata = json_encode($metadata);
+            }
+            $updateData['metadata'] = $metadata;
+        }
+
         // Update category
-        $category->update($request->only(['name', 'description', 'subcategories', 'is_active']));
+        $category->update($updateData);
 
         // Return success message along with updated category data
         return response()->json([
             'message' => 'Category updated successfully!',
-            'data' => $category
+            'data' => $category->fresh() // fresh() untuk mengambil data terbaru dari database
         ]);
     }
 

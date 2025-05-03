@@ -31,7 +31,7 @@ class SupplierController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'contact_info' => 'required|json',
+            'contact_info' => 'required',
             'is_active' => 'boolean'
         ]);
 
@@ -43,10 +43,15 @@ class SupplierController extends Controller
             ], 422);
         }
 
+        $contact_info = $request->contact_info;
+        if (is_array($contact_info)) {
+            $contact_info = json_encode($contact_info);
+        }
+
         try {
             $supplier = Supplier::create([
                 'name' => $request->name,
-                'contact_info' => json_decode($request->contact_info, true),
+                'contact_info' => $contact_info,
                 'is_active' => $request->is_active ?? true
             ]);
 
@@ -95,8 +100,13 @@ class SupplierController extends Controller
         try {
             $updateData = $request->only(['name', 'is_active']);
 
+            // Handle contact_info update
             if ($request->has('contact_info')) {
-                $updateData['contact_info'] = json_decode($request->contact_info, true);
+                $contact_info = $request->contact_info;
+                if (is_array($contact_info)) {
+                    $contact_info = json_encode($contact_info);
+                }
+                $updateData['contact_info'] = $contact_info;
             }
 
             $supplier->update($updateData);

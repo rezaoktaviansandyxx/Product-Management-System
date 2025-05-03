@@ -15,8 +15,8 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'supplier', 'attachments', 'deletedBy']);
 
-        if ($request->has('is_available')) {
-            $query->where('is_available', $request->is_available);
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
         }
 
         if ($request->has('category_id')) {
@@ -49,12 +49,12 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'specifications' => 'nullable|json',
+            'specifications' => 'nullable',
             'price' => 'required|numeric|min:0',
             'stock' => 'integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'supplier_id' => 'required|exists:suppliers,id',
-            'is_available' => 'boolean'
+            'is_active' => 'boolean'
         ]);
 
         if ($validator->fails()) {
@@ -64,15 +64,20 @@ class ProductController extends Controller
             ], 422);
         }
 
+        $specifications = $request->specifications;
+        if (is_array($specifications)) {
+            $specifications = json_encode($specifications);
+        }
+
         $product = Product::create([
             'name' => $request->name,
             'description' => $request->description,
-            'specifications' => json_decode($request->specifications, true) ?? [],
+            'specifications' => $specifications,
             'price' => $request->price,
             'stock' => $request->stock ?? 0,
             'category_id' => $request->category_id,
             'supplier_id' => $request->supplier_id,
-            'is_available' => $request->is_available ?? true
+            'is_active' => $request->is_active ?? true
         ]);
 
         return response()->json([
@@ -97,12 +102,12 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'specifications' => 'nullable|json',
+            'specifications' => 'nullable',
             'price' => 'sometimes|required|numeric|min:0',
             'stock' => 'integer|min:0',
             'category_id' => 'sometimes|required|exists:categories,id',
             'supplier_id' => 'sometimes|required|exists:suppliers,id',
-            'is_available' => 'sometimes|boolean'
+            'is_active' => 'sometimes|boolean'
         ]);
 
         if ($validator->fails()) {
@@ -119,11 +124,16 @@ class ProductController extends Controller
             'stock',
             'category_id',
             'supplier_id',
-            'is_available'
+            'is_active'
         ]);
 
+        // Handle specifications update
         if ($request->has('specifications')) {
-            $updateData['specifications'] = json_decode($request->specifications, true);
+            $specifications = $request->specifications;
+            if (is_array($specifications)) {
+                $specifications = json_encode($specifications);
+            }
+            $updateData['specifications'] = $specifications;
         }
 
         $product->update($updateData);

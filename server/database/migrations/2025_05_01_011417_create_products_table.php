@@ -15,12 +15,12 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->json('specifications');
+            $table->json('specifications')->nullable();
             $table->decimal('price', 12, 2);
             $table->integer('stock')->default(0);
             $table->uuid('category_id');
             $table->uuid('supplier_id');
-            $table->boolean('is_available')->default(true);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
             $table->uuid('deleted_by')->nullable();
