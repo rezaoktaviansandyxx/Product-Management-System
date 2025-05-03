@@ -19,7 +19,6 @@ class Supplier extends Model
     ];
 
     protected $casts = [
-        'contact_info' => 'array',
         'is_active' => 'boolean'
     ];
 

@@ -18,7 +18,6 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'specifications' => 'array',
         'is_active' => 'boolean'
     ];
 
