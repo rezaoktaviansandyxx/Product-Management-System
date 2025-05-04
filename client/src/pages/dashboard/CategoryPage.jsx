@@ -236,11 +236,11 @@ const CategoryPage = () => {
 
       <div className="row mb-3">
         <div className="col-md-6">
-          <button className="btn btn-primary me-2" onClick={handleAddCategory}>
+          <button className="btn btn-primary me-2" onClick={handleAddCategory} disabled={isLoading}>
             Add Category
           </button>
 
-          <button className="btn btn-success me-2" onClick={handleExport}>
+          <button className="btn btn-success me-2" onClick={handleExport} disabled={isLoading}>
             Export
           </button>
 
@@ -252,6 +252,7 @@ const CategoryPage = () => {
               accept=".xlsx,.xls"
               style={{ display: 'none' }}
               onChange={(e) => handleImport(e)}
+              disabled={isLoading}
             />
           </label>
         </div>
