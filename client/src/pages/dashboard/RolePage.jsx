@@ -242,7 +242,7 @@ const RolePage = () => {
                         Export
                     </button>
 
-                    <label htmlFor="import" className="btn btn-info me-2">
+                    <label htmlFor="import" className={`btn btn-info me-2 ${isLoading ? 'disabled' : ''}`}>
                         Import
                         <input
                             id="import"
