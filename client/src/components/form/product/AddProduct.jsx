@@ -33,8 +33,17 @@ const AddProduct = ({ onSuccess, onClose }) => {
         }
 
         // Fetch suppliers and categories
-        axios.get(AppConfig.API_URL + '/suppliers').then(res => setSuppliers(res.data.data));
-        axios.get(AppConfig.API_URL + '/categories').then(res => setCategories(res.data.data));
+        axios.get(AppConfig.API_URL + '/suppliers')
+            .then(res => {
+                const activeSuppliers = res.data.data.filter(supplier => supplier.is_active);
+                setSuppliers(activeSuppliers);
+            });
+
+        axios.get(AppConfig.API_URL + '/categories')
+            .then(res => {
+                const activeCategories = res.data.data.filter(category => category.is_active);
+                setCategories(activeCategories);
+            });
     }, [token]);
 
     useEffect(() => {

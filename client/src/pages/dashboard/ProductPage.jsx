@@ -266,8 +266,8 @@ const ProductPage = () => {
                           })()}
                         </ul>
                       </td>
-                      <td>{product.supplier ? product.supplier.name : '-'}</td>
-                      <td>{product.category ? product.category.name : '-'}</td>
+                      <td>{product.supplier.is_active ? product.supplier.name : '-'}</td>
+                      <td>{product.category.is_active ? product.category.name : '-'}</td>
                       <td>{parseFloat(product.price).toLocaleString('id-ID')}</td>
                       <td>{product.stock}</td>
                       <td>

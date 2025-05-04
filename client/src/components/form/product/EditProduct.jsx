@@ -36,20 +36,6 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
 
-        // Fetch suppliers and categories
-        const fetchData = async () => {
-            try {
-                const [suppliersRes, categoriesRes] = await Promise.all([
-                    axios.get(AppConfig.API_URL + '/suppliers'),
-                    axios.get(AppConfig.API_URL + '/categories')
-                ]);
-                setSuppliers(suppliersRes.data.data);
-                setCategories(categoriesRes.data.data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
         fetchData();
 
         // Set initial form data when product prop changes
@@ -85,6 +71,25 @@ const EditProduct = ({ product, onSuccess, onClose }) => {
             formData.stock && !isNaN(formData.stock);
         setIsFormValid(requiredFieldsFilled && !hasErrors);
     }, [formData, errors]);
+
+    // Fetch suppliers and categories
+    const fetchData = async () => {
+        try {
+            axios.get(AppConfig.API_URL + '/suppliers')
+                .then(res => {
+                    const activeSuppliers = res.data.data.filter(supplier => supplier.is_active);
+                    setSuppliers(activeSuppliers);
+                });
+
+            axios.get(AppConfig.API_URL + '/categories')
+                .then(res => {
+                    const activeCategories = res.data.data.filter(category => category.is_active);
+                    setCategories(activeCategories);
+                });
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
 
     // Handle input changes
     const handleChange = (e) => {
