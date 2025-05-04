@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import AppConfig from '../../../config/AppConfig';
 import Swal from 'sweetalert2';
+import AuditLogTable from '../../AuditLogTable';
 
 const EditCategory = ({ category, onSuccess, onClose }) => {
     const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const EditCategory = ({ category, onSuccess, onClose }) => {
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
 
     const token = localStorage.getItem("token");
 
@@ -34,6 +36,13 @@ const EditCategory = ({ category, onSuccess, onClose }) => {
             });
         }
     }, [token, category]);
+
+    useEffect(() => {
+        // Validate form whenever formData or errors change
+        const hasErrors = Object.values(errors).some(error => error);
+        const requiredFieldsFilled = formData.name.trim();
+        setIsFormValid(requiredFieldsFilled && !hasErrors);
+    }, [formData, errors]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -102,77 +111,98 @@ const EditCategory = ({ category, onSuccess, onClose }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-                <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                </label>
-                <input
-                    type="text"
-                    name="name"
-                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                    value={formData.name}
-                    onChange={handleChange}
-                />
-                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+        <div className='d-flex gap-4' style={{ height: '100%' }}>
+            <div className="flex-fill" style={{ height: '100%', overflow: 'auto' }}>
+                <div className="card h-100">
+                    <div className="card-body">
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label className="form-label">
+                                    Name <span className="text-danger">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                />
+                                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Description</label>
+                                <textarea
+                                    name="description"
+                                    className="form-control"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                ></textarea>
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Note</label>
+                                <input
+                                    type="text"
+                                    name="notes"
+                                    className="form-control"
+                                    value={formData.notes}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Tags</label>
+                                <input
+                                    type="text"
+                                    name="tags"
+                                    className="form-control"
+                                    value={formData.tags}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="form-label">Status</label>
+                                <select
+                                    name="is_active"
+                                    className="form-control"
+                                    value={formData.is_active.toString()}
+                                    onChange={handleChange}
+                                >
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                </select>
+                            </div>
+                            <div className="d-flex justify-content-end gap-2">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={onClose}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={loading || !isFormValid}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        'Update'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div className="mb-3">
-                <label className="form-label">Description</label>
-                <textarea
-                    name="description"
-                    className="form-control"
-                    value={formData.description}
-                    onChange={handleChange}
-                ></textarea>
+            {/* Audit Log Table Section */}
+            <div className="flex-fill" style={{ height: '100%' }}>
+                <AuditLogTable tableName={"categories"} />
             </div>
-            <div className="mb-3">
-                <label className="form-label">Note</label>
-                <input
-                    type="text"
-                    name="notes"
-                    className="form-control"
-                    value={formData.notes}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Tags</label>
-                <input
-                    type="text"
-                    name="tags"
-                    className="form-control"
-                    value={formData.tags}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Status</label>
-                <select
-                    name="is_active"
-                    className="form-control"
-                    value={formData.is_active.toString()}
-                    onChange={handleChange}
-                >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
-            </div>
-            <div className="d-flex justify-content-end gap-2">
-                <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>
-                    Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                    {loading ? (
-                        <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            Updating...
-                        </>
-                    ) : (
-                        'Update'
-                    )}
-                </button>
-            </div>
-        </form>
+        </div>
     );
 };
 

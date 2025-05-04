@@ -278,7 +278,7 @@ const RolePage = () => {
             {/* Modal AddRole */}
             {showAddModal && (
                 <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-lg">
+                    <div className="modal-dialog modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Add Role</h5>
@@ -300,7 +300,7 @@ const RolePage = () => {
 
             {showEditModal && selectedRole && (
                 <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-lg">
+                    <div className="modal-dialog modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Edit Role</h5>

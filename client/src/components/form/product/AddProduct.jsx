@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import AppConfig from '../../../config/AppConfig';
+import AuditLogTable from '../../AuditLogTable';
 
 const AddProduct = ({ onSuccess, onClose }) => {
     const [formData, setFormData] = useState({
@@ -196,176 +197,188 @@ const AddProduct = ({ onSuccess, onClose }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-            {/* Product Name */}
-            <div className="mb-3">
-                <label className="form-label">Name <span className="text-danger">*</span></label>
-                <input
-                    type="text"
-                    name="name"
-                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                    value={formData.name}
-                    onChange={handleChange}
-                />
-                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-            </div>
+        <div className='d-flex gap-4' style={{ height: '100%' }}>
+            <div className="flex-fill" style={{ height: '100%', overflow: 'auto' }}>
+                <div className="card h-100">
+                    <div className="card-body">
+                        <form onSubmit={handleSubmit} encType="multipart/form-data">
+                            {/* Product Name */}
+                            <div className="mb-3">
+                                <label className="form-label">Name <span className="text-danger">*</span></label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                />
+                                {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                            </div>
 
-            {/* Description */}
-            <div className="mb-3">
-                <label className="form-label">Description</label>
-                <textarea
-                    name="description"
-                    className="form-control"
-                    rows="3"
-                    value={formData.description}
-                    onChange={handleChange}
-                />
-            </div>
+                            {/* Description */}
+                            <div className="mb-3">
+                                <label className="form-label">Description</label>
+                                <textarea
+                                    name="description"
+                                    className="form-control"
+                                    rows="3"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                />
+                            </div>
 
-            {/* Specifications */}
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <label className="form-label">Serial Number</label>
-                    <input
-                        type="text"
-                        name="serial_number"
-                        className="form-control"
-                        value={formData.serial_number}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Tags</label>
-                    <input
-                        type="text"
-                        name="tags"
-                        className="form-control"
-                        value={formData.tags}
-                        onChange={handleChange}
-                    />
-                </div>
-            </div>
+                            {/* Specifications */}
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Serial Number</label>
+                                    <input
+                                        type="text"
+                                        name="serial_number"
+                                        className="form-control"
+                                        value={formData.serial_number}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label">Tags</label>
+                                    <input
+                                        type="text"
+                                        name="tags"
+                                        className="form-control"
+                                        value={formData.tags}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
 
-            {/* Supplier and Category */}
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <label className="form-label">Supplier <span className="text-danger">*</span></label>
-                    <select
-                        name="supplier_id"
-                        className={`form-control ${errors.supplier_id ? 'is-invalid' : ''}`}
-                        value={formData.supplier_id}
-                        onChange={handleChange}
-                    >
-                        <option value="">-- Select Supplier --</option>
-                        {suppliers.map((supplier) => (
-                            <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
-                        ))}
-                    </select>
-                    {errors.supplier_id && <div className="invalid-feedback">{errors.supplier_id}</div>}
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Category <span className="text-danger">*</span></label>
-                    <select
-                        name="category_id"
-                        className={`form-control ${errors.category_id ? 'is-invalid' : ''}`}
-                        value={formData.category_id}
-                        onChange={handleChange}
-                    >
-                        <option value="">-- Select Category --</option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>{category.name}</option>
-                        ))}
-                    </select>
-                    {errors.category_id && <div className="invalid-feedback">{errors.category_id}</div>}
-                </div>
-            </div>
+                            {/* Supplier and Category */}
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Supplier <span className="text-danger">*</span></label>
+                                    <select
+                                        name="supplier_id"
+                                        className={`form-control ${errors.supplier_id ? 'is-invalid' : ''}`}
+                                        value={formData.supplier_id}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">-- Select Supplier --</option>
+                                        {suppliers.map((supplier) => (
+                                            <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                                        ))}
+                                    </select>
+                                    {errors.supplier_id && <div className="invalid-feedback">{errors.supplier_id}</div>}
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label">Category <span className="text-danger">*</span></label>
+                                    <select
+                                        name="category_id"
+                                        className={`form-control ${errors.category_id ? 'is-invalid' : ''}`}
+                                        value={formData.category_id}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">-- Select Category --</option>
+                                        {categories.map((category) => (
+                                            <option key={category.id} value={category.id}>{category.name}</option>
+                                        ))}
+                                    </select>
+                                    {errors.category_id && <div className="invalid-feedback">{errors.category_id}</div>}
+                                </div>
+                            </div>
 
-            {/* Price and Stock */}
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <label className="form-label">Price (Rp) <span className="text-danger">*</span></label>
-                    <input
-                        type="number"
-                        name="price"
-                        className={`form-control ${errors.price ? 'is-invalid' : ''}`}
-                        value={formData.price}
-                        onChange={handleChange}
-                    />
-                    {errors.price && <div className="invalid-feedback">{errors.price}</div>}
-                </div>
-                <div className="col-md-6">
-                    <label className="form-label">Stock <span className="text-danger">*</span></label>
-                    <input
-                        type="number"
-                        name="stock"
-                        className={`form-control ${errors.stock ? 'is-invalid' : ''}`}
-                        value={formData.stock}
-                        onChange={handleChange}
-                    />
-                    {errors.stock && <div className="invalid-feedback">{errors.stock}</div>}
-                </div>
-            </div>
+                            {/* Price and Stock */}
+                            <div className="row mb-3">
+                                <div className="col-md-6">
+                                    <label className="form-label">Price (Rp) <span className="text-danger">*</span></label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        className={`form-control ${errors.price ? 'is-invalid' : ''}`}
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                    />
+                                    {errors.price && <div className="invalid-feedback">{errors.price}</div>}
+                                </div>
+                                <div className="col-md-6">
+                                    <label className="form-label">Stock <span className="text-danger">*</span></label>
+                                    <input
+                                        type="number"
+                                        name="stock"
+                                        className={`form-control ${errors.stock ? 'is-invalid' : ''}`}
+                                        value={formData.stock}
+                                        onChange={handleChange}
+                                    />
+                                    {errors.stock && <div className="invalid-feedback">{errors.stock}</div>}
+                                </div>
+                            </div>
 
-            {/* Attachment */}
-            <div className="mb-3">
-                <label className="form-label">Attachment</label>
-                <input
-                    type="file"
-                    name="attachments"
-                    className={`form-control ${errors.attachments ? 'is-invalid' : ''}`}
-                    accept="application/pdf"
-                    onChange={handleFileChange}
-                />
-                {filePreview && (
-                    <div className="mt-2 text-success">
-                        <i className="bi bi-check-circle-fill me-2"></i>
-                        Selected file: {filePreview}
+                            {/* Attachment */}
+                            <div className="mb-3">
+                                <label className="form-label">Attachment</label>
+                                <input
+                                    type="file"
+                                    name="attachments"
+                                    className={`form-control ${errors.attachments ? 'is-invalid' : ''}`}
+                                    accept="application/pdf"
+                                    onChange={handleFileChange}
+                                />
+                                {filePreview && (
+                                    <div className="mt-2 text-success">
+                                        <i className="bi bi-check-circle-fill me-2"></i>
+                                        Selected file: {filePreview}
+                                    </div>
+                                )}
+                                {errors.attachments && <div className="invalid-feedback">{errors.attachments}</div>}
+                                <small className="text-muted">PDF only (100KB-500KB)</small>
+                            </div>
+
+                            {/* Status */}
+                            <div className="mb-4">
+                                <label className="form-label">Status</label>
+                                <select
+                                    name="is_active"
+                                    className="form-control"
+                                    value={formData.is_active.toString()}
+                                    onChange={handleChange}
+                                >
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                </select>
+                            </div>
+
+                            {/* Form Actions */}
+                            <div className="d-flex justify-content-end gap-2">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={onClose}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                    disabled={loading || !isFormValid}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )}
-                {errors.attachments && <div className="invalid-feedback">{errors.attachments}</div>}
-                <small className="text-muted">PDF only (100KB-500KB)</small>
+                </div>
             </div>
-
-            {/* Status */}
-            <div className="mb-4">
-                <label className="form-label">Status</label>
-                <select
-                    name="is_active"
-                    className="form-control"
-                    value={formData.is_active.toString()}
-                    onChange={handleChange}
-                >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
+            {/* Audit Log Table Section */}
+            <div className="flex-fill" style={{ height: '100%' }}>
+                <AuditLogTable tableName={"products"} />
             </div>
-
-            {/* Form Actions */}
-            <div className="d-flex justify-content-end gap-2">
-                <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onClose}
-                    disabled={loading}
-                >
-                    Cancel
-                </button>
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={loading || !isFormValid}
-                >
-                    {loading ? (
-                        <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Creating...
-                        </>
-                    ) : (
-                        'Create'
-                    )}
-                </button>
-            </div>
-        </form>
+        </div>
     );
 };
 

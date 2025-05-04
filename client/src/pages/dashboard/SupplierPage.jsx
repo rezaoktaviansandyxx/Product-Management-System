@@ -303,7 +303,7 @@ const SupplierPage = () => {
       {/* Modal AddSupplier */}
       {showAddModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-xl">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Add Supplier</h5>
@@ -325,7 +325,7 @@ const SupplierPage = () => {
 
       {showEditModal && selectedSupplier && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-xl">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Edit Supplier</h5>

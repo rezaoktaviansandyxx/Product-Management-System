@@ -169,7 +169,6 @@ const UserPage = () => {
             <div className="row mb-3">
                 <div className="col-md-6">
                     <button className="btn btn-primary" onClick={handleAddUser}>
-                        <i className="bi bi-plus-circle me-2"></i>
                         Add User
                     </button>
                 </div>
@@ -205,30 +204,30 @@ const UserPage = () => {
                             <thead className="thead-dark">
                                 <tr>
                                     <th scope="col">No</th>
-                                    <th 
-                                        scope="col" 
-                                        onClick={() => requestSort('username')} 
+                                    <th
+                                        scope="col"
+                                        onClick={() => requestSort('username')}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Name {getSortIndicator('username')}
                                     </th>
-                                    <th 
-                                        scope="col" 
-                                        onClick={() => requestSort('email')} 
+                                    <th
+                                        scope="col"
+                                        onClick={() => requestSort('email')}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Email {getSortIndicator('email')}
                                     </th>
-                                    <th 
-                                        scope="col" 
-                                        onClick={() => requestSort('role_name')} 
+                                    <th
+                                        scope="col"
+                                        onClick={() => requestSort('role_name')}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Role {getSortIndicator('role_name')}
                                     </th>
-                                    <th 
-                                        scope="col" 
-                                        onClick={() => requestSort('is_active')} 
+                                    <th
+                                        scope="col"
+                                        onClick={() => requestSort('is_active')}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         Status {getSortIndicator('is_active')}
@@ -287,7 +286,7 @@ const UserPage = () => {
             {/* Add User Modal */}
             {showAddModal && (
                 <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog">
+                    <div className="modal-dialog modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Add New User</h5>
@@ -310,7 +309,7 @@ const UserPage = () => {
             {/* Edit User Modal */}
             {showEditModal && selectedUser && (
                 <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog">
+                    <div className="modal-dialog modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Edit User</h5>
