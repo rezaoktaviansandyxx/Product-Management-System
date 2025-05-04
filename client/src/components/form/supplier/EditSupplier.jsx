@@ -115,7 +115,9 @@ const EditSupplier = ({ supplier, onSuccess, onClose }) => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-3">
-                <label className="form-label">Name</label>
+                <label className="form-label">
+                    Name <span className="text-danger">*</span>
+                </label>
                 <input
                     type="text"
                     name="name"
@@ -126,7 +128,9 @@ const EditSupplier = ({ supplier, onSuccess, onClose }) => {
                 {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Address</label>
+                <label className="form-label">
+                    Address <span className="text-danger">*</span>
+                </label>
                 <input
                     type="text"
                     name="address"
@@ -137,7 +141,9 @@ const EditSupplier = ({ supplier, onSuccess, onClose }) => {
                 {errors.address && <div className="invalid-feedback">{errors.address}</div>}
             </div>
             <div className="mb-3">
-                <label className="form-label">Phone</label>
+                <label className="form-label">
+                    Phone <span className="text-danger">*</span>
+                </label>
                 <input
                     type="text"
                     name="phone"

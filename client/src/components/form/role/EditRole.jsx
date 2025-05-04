@@ -92,7 +92,9 @@ const EditRole = ({ role, onSuccess, onClose }) => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-3">
-                <label className="form-label">Name</label>
+                <label className="form-label">
+                    Name <span className="text-danger">*</span>
+                </label>
                 <input
                     type="text"
                     name="name"

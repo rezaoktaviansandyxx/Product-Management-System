@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-
 import axios from 'axios';
 import AppConfig from '../../config/AppConfig';
 import AddCategory from '../../components/form/category/AddCategory';
@@ -7,11 +6,16 @@ import EditCategory from '../../components/form/category/EditCategory';
 import Swal from 'sweetalert2';
 
 const CategoryPage = () => {
-
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({
+    key: 'name',
+    direction: 'ascending'
+  });
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -22,10 +26,74 @@ const CategoryPage = () => {
     fetchCategories();
   }, [token]);
 
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredCategories(categories);
+      return;
+    }
+
+    const filtered = categories.filter(category =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    setFilteredCategories(filtered);
+  }, [searchTerm, categories]);
+
+  useEffect(() => {
+    let sortedCategories = [...categories];
+
+    if (sortConfig.key) {
+      sortedCategories.sort((a, b) => {
+        // Handle null values
+        if (a[sortConfig.key] === null) return 1;
+        if (b[sortConfig.key] === null) return -1;
+
+        // Handle metadata parsing for notes and tags
+        if (sortConfig.key === 'metadata') {
+          const aData = a.metadata ? JSON.parse(a.metadata) : {};
+          const bData = b.metadata ? JSON.parse(b.metadata) : {};
+
+          const aValue = aData.notes || aData.tags || '';
+          const bValue = bData.notes || bData.tags || '';
+
+          return aValue.toString().localeCompare(bValue.toString());
+        }
+
+        // Handle boolean values (is_active)
+        if (sortConfig.key === 'is_active') {
+          return a.is_active === b.is_active ? 0 : a.is_active ? -1 : 1;
+        }
+
+        // Default string comparison
+        if (typeof a[sortConfig.key] === 'string') {
+          return a[sortConfig.key].localeCompare(b[sortConfig.key]);
+        }
+
+        return a[sortConfig.key] > b[sortConfig.key] ? 1 : -1;
+      });
+
+      if (sortConfig.direction === 'descending') {
+        sortedCategories.reverse();
+      }
+    }
+
+    // Apply search filter to sorted categories
+    if (searchTerm) {
+      sortedCategories = sortedCategories.filter(category =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredCategories(sortedCategories);
+  }, [sortConfig, categories, searchTerm]);
+
   const fetchCategories = async () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/categories');
       setCategories(response.data.data);
+      setFilteredCategories(response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -74,14 +142,63 @@ const CategoryPage = () => {
     }
   };
 
+  // Sorting functionality
+  const requestSort = (key) => {
+    let direction = 'ascending';
+
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+
+    setSortConfig({ key, direction });
+  };
+
+  // Search functionality
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Helper function to get sort indicator
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+    }
+    return '';
+  };
+
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Category List</h1>
 
-      <div className="mb-3 text-start">
-        <button className="btn btn-primary" onClick={handleAddCategory}>
-          Add Category
-        </button>
+      <div className="row mb-3">
+        <div className="col-md-6">
+          <button className="btn btn-primary" onClick={handleAddCategory}>
+            Add Category
+          </button>
+        </div>
+        <div className="col-md-6">
+          <div className="input-group">
+            <span className="input-group-text">
+              <i className="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by name or description..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            {searchTerm && (
+              <button
+                className="btn btn-danger"
+                type="button"
+                onClick={() => setSearchTerm('')}
+              >
+                <span>Clear</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -91,16 +208,40 @@ const CategoryPage = () => {
               <thead className="thead-dark">
                 <tr>
                   <th scope="col">No</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Description</th>
-                  <th scope="col">Attribute</th>
-                  <th scope="col">Status</th>
+                  <th
+                    scope="col"
+                    onClick={() => requestSort('name')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Name {getSortIndicator('name')}
+                  </th>
+                  <th
+                    scope="col"
+                    onClick={() => requestSort('description')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Description {getSortIndicator('description')}
+                  </th>
+                  <th
+                    scope="col"
+                    onClick={() => requestSort('metadata')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Attribute {getSortIndicator('metadata')}
+                  </th>
+                  <th
+                    scope="col"
+                    onClick={() => requestSort('is_active')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Status {getSortIndicator('is_active')}
+                  </th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {categories.length > 0 ? (
-                  categories.map((category, index) => (
+                {filteredCategories.length > 0 ? (
+                  filteredCategories.map((category, index) => (
                     <tr key={category.id}>
                       <th scope="row">{index + 1}</th>
                       <td>{category.name}</td>
@@ -141,12 +282,20 @@ const CategoryPage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center">No categories found</td>
+                    <td colSpan="6" className="text-center">
+                      {searchTerm ? 'No categories matching your search criteria.' : 'No categories found.'}
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {filteredCategories.length > 0 && (
+            <div className="d-flex justify-content-end mt-3">
+              <p>Showing {filteredCategories.length} of {categories.length} categories</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -162,8 +311,8 @@ const CategoryPage = () => {
               <div className="modal-body">
                 <AddCategory
                   onSuccess={() => {
-                    fetchCategories();  // Refresh list
-                    setShowAddModal(false); // Tutup modal
+                    fetchCategories();
+                    setShowAddModal(false);
                   }}
                   onClose={handleCloseModal}
                 />
@@ -185,8 +334,8 @@ const CategoryPage = () => {
                 <EditCategory
                   category={selectedCategory}
                   onSuccess={() => {
-                    fetchCategories();  // Refresh list
-                    setShowEditModal(false); // Close modal
+                    fetchCategories();
+                    setShowEditModal(false);
                   }}
                   onClose={() => setShowEditModal(false)}
                 />

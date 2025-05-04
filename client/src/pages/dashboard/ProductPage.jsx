@@ -6,11 +6,17 @@ import EditProduct from '../../components/form/product/EditProduct';
 import Swal from 'sweetalert2';
 
 const ProductPage = () => {
-
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({
+    key: 'name',
+    direction: 'ascending'
+  });
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -21,10 +27,76 @@ const ProductPage = () => {
     fetchProducts();
   }, [token]);
 
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredProducts(products);
+      return;
+    }
+
+    const filtered = products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.supplier && product.supplier.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (product.category && product.category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    setFilteredProducts(filtered);
+  }, [searchTerm, products]);
+
+  useEffect(() => {
+    let sortedProducts = [...products];
+
+    if (sortConfig.key) {
+      sortedProducts.sort((a, b) => {
+        // Handle null values
+        if (a[sortConfig.key] === null) return 1;
+        if (b[sortConfig.key] === null) return -1;
+
+        // Handle nested objects (supplier, category)
+        if (sortConfig.key === 'supplier' && a.supplier && b.supplier) {
+          return a.supplier.name.localeCompare(b.supplier.name);
+        }
+
+        if (sortConfig.key === 'category' && a.category && b.category) {
+          return a.category.name.localeCompare(b.category.name);
+        }
+
+        // Handle numeric values
+        if (sortConfig.key === 'price' || sortConfig.key === 'stock') {
+          return parseFloat(a[sortConfig.key]) - parseFloat(b[sortConfig.key]);
+        }
+
+        // Default string comparison
+        if (typeof a[sortConfig.key] === 'string') {
+          return a[sortConfig.key].localeCompare(b[sortConfig.key]);
+        }
+
+        return a[sortConfig.key] > b[sortConfig.key] ? 1 : -1;
+      });
+
+      if (sortConfig.direction === 'descending') {
+        sortedProducts.reverse();
+      }
+    }
+
+    // Apply search filter to sorted products
+    if (searchTerm) {
+      sortedProducts = sortedProducts.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.supplier && product.supplier.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.category && product.category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredProducts(sortedProducts);
+  }, [sortConfig, products, searchTerm]);
+
   const fetchProducts = async () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/products');
       setProducts(response.data.data);
+      setFilteredProducts(response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -82,14 +154,63 @@ const ProductPage = () => {
     setSelectedProduct(null);
   };
 
+  // Sorting functionality
+  const requestSort = (key) => {
+    let direction = 'ascending';
+
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+
+    setSortConfig({ key, direction });
+  };
+
+  // Search functionality
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Helper function to get sort indicator
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+    }
+    return '';
+  };
+
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Product List</h1>
 
-      <div className="mb-3 text-start">
-        <button className="btn btn-primary" onClick={handleAddCategory}>
-          Add Product
-        </button>
+      <div className="row mb-3">
+        <div className="col-md-6">
+          <button className="btn btn-primary" onClick={handleAddCategory}>
+            Add Product
+          </button>
+        </div>
+        <div className="col-md-6">
+          <div className="input-group">
+            <span className="input-group-text">
+              <i className="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by name, description, supplier or category..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            {searchTerm && (
+              <button
+                className="btn btn-danger"
+                type="button"
+                onClick={() => setSearchTerm('')}
+              >
+                <span>Clear</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -99,21 +220,35 @@ const ProductPage = () => {
               <thead className="thead-dark">
                 <tr>
                   <th>No</th>
-                  <th>Name</th>
-                  <th>Description</th>
+                  <th onClick={() => requestSort('name')} style={{ cursor: 'pointer' }}>
+                    Name {getSortIndicator('name')}
+                  </th>
+                  <th onClick={() => requestSort('description')} style={{ cursor: 'pointer' }}>
+                    Description {getSortIndicator('description')}
+                  </th>
                   <th>Specification</th>
-                  <th>Supplier</th>
-                  <th>Category</th>
-                  <th>Price (Rp)</th>
-                  <th>Stock</th>
+                  <th onClick={() => requestSort('supplier')} style={{ cursor: 'pointer' }}>
+                    Supplier {getSortIndicator('supplier')}
+                  </th>
+                  <th onClick={() => requestSort('category')} style={{ cursor: 'pointer' }}>
+                    Category {getSortIndicator('category')}
+                  </th>
+                  <th onClick={() => requestSort('price')} style={{ cursor: 'pointer' }}>
+                    Price (Rp) {getSortIndicator('price')}
+                  </th>
+                  <th onClick={() => requestSort('stock')} style={{ cursor: 'pointer' }}>
+                    Stock {getSortIndicator('stock')}
+                  </th>
                   <th>Attachment</th>
-                  <th>Status</th>
+                  <th onClick={() => requestSort('is_active')} style={{ cursor: 'pointer' }}>
+                    Status {getSortIndicator('is_active')}
+                  </th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {products.length > 0 ? (
-                  products.map((product, index) => (
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product, index) => (
                     <tr key={product.id}>
                       <td>{index + 1}</td>
                       <td>{product.name}</td>
@@ -167,12 +302,20 @@ const ProductPage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="10" className="text-center">No products available.</td>
+                    <td colSpan="11" className="text-center">
+                      {searchTerm ? 'No products matching your search criteria.' : 'No products available.'}
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {filteredProducts.length > 0 && (
+            <div className="d-flex justify-content-end mt-3">
+              <p>Showing {filteredProducts.length} of {products.length} products</p>
+            </div>
+          )}
         </div>
       </div>
 

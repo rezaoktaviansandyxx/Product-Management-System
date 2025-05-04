@@ -7,9 +7,15 @@ import Swal from 'sweetalert2';
 
 const SupplierPage = () => {
   const [suppliers, setSuppliers] = useState([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({
+    key: 'name',
+    direction: 'ascending'
+  });
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -20,10 +26,78 @@ const SupplierPage = () => {
     fetchSuppliers();
   }, [token]);
 
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredSuppliers(suppliers);
+      return;
+    }
+
+    const filtered = suppliers.filter(supplier =>
+      supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (supplier.contact_info && supplier.contact_info.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+    setFilteredSuppliers(filtered);
+  }, [searchTerm, suppliers]);
+
+  useEffect(() => {
+    let sortedSuppliers = [...suppliers];
+
+    if (sortConfig.key) {
+      sortedSuppliers.sort((a, b) => {
+        // Handle contact_info separately as it's JSON
+        if (sortConfig.key === 'address' || sortConfig.key === 'phone') {
+          const aContact = parseContactInfo(a.contact_info);
+          const bContact = parseContactInfo(b.contact_info);
+          
+          const aValue = aContact[sortConfig.key] || '';
+          const bValue = bContact[sortConfig.key] || '';
+          
+          return aValue.toString().localeCompare(bValue.toString());
+        }
+
+        // Handle boolean values (is_active)
+        if (sortConfig.key === 'is_active') {
+          return a.is_active === b.is_active ? 0 : a.is_active ? -1 : 1;
+        }
+
+        // Default string comparison
+        if (typeof a[sortConfig.key] === 'string') {
+          return a[sortConfig.key].localeCompare(b[sortConfig.key]);
+        }
+
+        return a[sortConfig.key] > b[sortConfig.key] ? 1 : -1;
+      });
+
+      if (sortConfig.direction === 'descending') {
+        sortedSuppliers.reverse();
+      }
+    }
+
+    // Apply search filter to sorted suppliers
+    if (searchTerm) {
+      sortedSuppliers = sortedSuppliers.filter(supplier =>
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (supplier.contact_info && supplier.contact_info.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredSuppliers(sortedSuppliers);
+  }, [sortConfig, suppliers, searchTerm]);
+
+  const parseContactInfo = (contactInfo) => {
+    try {
+      return JSON.parse(contactInfo || '{}');
+    } catch {
+      return {};
+    }
+  };
+
   const fetchSuppliers = async () => {
     try {
       const response = await axios.get(AppConfig.API_URL + '/suppliers');
       setSuppliers(response.data.data);
+      setFilteredSuppliers(response.data.data);
     } catch (err) {
       console.error(err);
     }
@@ -77,14 +151,63 @@ const SupplierPage = () => {
     }
   };
 
+  // Sorting functionality
+  const requestSort = (key) => {
+    let direction = 'ascending';
+
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+
+    setSortConfig({ key, direction });
+  };
+
+  // Search functionality
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Helper function to get sort indicator
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+    }
+    return '';
+  };
+
   return (
     <div className="container mt-4">
       <h1 className="mb-4">Supplier List</h1>
 
-      <div className="mb-3 text-start">
-        <button className="btn btn-primary" onClick={handleAddSupplier}>
-          Add Supplier
-        </button>
+      <div className="row mb-3">
+        <div className="col-md-6">
+          <button className="btn btn-primary" onClick={handleAddSupplier}>
+            Add Supplier
+          </button>
+        </div>
+        <div className="col-md-6">
+          <div className="input-group">
+            <span className="input-group-text">
+              <i className="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by name or contact info..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            {searchTerm && (
+              <button
+                className="btn btn-danger"
+                type="button"
+                onClick={() => setSearchTerm('')}
+              >
+                <span>Clear</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -94,30 +217,48 @@ const SupplierPage = () => {
               <thead className="thead-dark">
                 <tr>
                   <th scope="col">No</th>
-                  <th scope="col">Name</th>
-                  <th scope="col">Address</th>
-                  <th scope="col">Phone</th>
-                  <th scope="col">Status</th>
+                  <th 
+                    scope="col" 
+                    onClick={() => requestSort('name')} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Name {getSortIndicator('name')}
+                  </th>
+                  <th 
+                    scope="col" 
+                    onClick={() => requestSort('address')} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Address {getSortIndicator('address')}
+                  </th>
+                  <th 
+                    scope="col" 
+                    onClick={() => requestSort('phone')} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Phone {getSortIndicator('phone')}
+                  </th>
+                  <th 
+                    scope="col" 
+                    onClick={() => requestSort('is_active')} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Status {getSortIndicator('is_active')}
+                  </th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {suppliers.length > 0 ? (
-                  suppliers.map((supplier, index) => {
-                    const parsedContactInfo = (() => {
-                      try {
-                        return JSON.parse(supplier.contact_info || '{}');
-                      } catch {
-                        return {};
-                      }
-                    })();
+                {filteredSuppliers.length > 0 ? (
+                  filteredSuppliers.map((supplier, index) => {
+                    const contactInfo = parseContactInfo(supplier.contact_info);
 
                     return (
                       <tr key={supplier.id}>
                         <th scope="row">{index + 1}</th>
                         <td>{supplier.name}</td>
-                        <td>{parsedContactInfo.address || '-'}</td>
-                        <td>{parsedContactInfo.phone || '-'}</td>
+                        <td>{contactInfo.address || '-'}</td>
+                        <td>{contactInfo.phone || '-'}</td>
                         <td>
                           <span className={`badge ${supplier.is_active ? 'bg-success' : 'bg-secondary'}`}>
                             {supplier.is_active ? 'Active' : 'Inactive'}
@@ -139,20 +280,27 @@ const SupplierPage = () => {
                         </td>
                       </tr>
                     );
-
                   })
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center">No supplier found</td>
+                    <td colSpan="6" className="text-center">
+                      {searchTerm ? 'No suppliers matching your search criteria.' : 'No suppliers found.'}
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {filteredSuppliers.length > 0 && (
+            <div className="d-flex justify-content-end mt-3">
+              <p>Showing {filteredSuppliers.length} of {suppliers.length} suppliers</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Modal AddSuplier */}
+      {/* Modal AddSupplier */}
       {showAddModal && (
         <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
@@ -164,8 +312,8 @@ const SupplierPage = () => {
               <div className="modal-body">
                 <AddSupplier
                   onSuccess={() => {
-                    fetchSuppliers();  // Refresh list
-                    setShowAddModal(false); // Tutup modal
+                    fetchSuppliers();
+                    setShowAddModal(false);
                   }}
                   onClose={handleCloseModal}
                 />
@@ -187,8 +335,8 @@ const SupplierPage = () => {
                 <EditSupplier
                   supplier={selectedSupplier}
                   onSuccess={() => {
-                    fetchSuppliers();  // Refresh list
-                    handleCloseEditModal(); // Tutup modal
+                    fetchSuppliers();
+                    handleCloseEditModal();
                   }}
                   onClose={handleCloseEditModal}
                 />
