@@ -234,11 +234,11 @@ const RolePage = () => {
 
             <div className="row mb-3">
                 <div className="col-md-6">
-                    <button className="btn btn-primary me-2" onClick={handleAddRole}>
+                    <button className="btn btn-primary me-2" onClick={handleAddRole} disabled={isLoading}>
                         Add Role
                     </button>
 
-                    <button className="btn btn-success me-2" onClick={handleExport}>
+                    <button className="btn btn-success me-2" onClick={handleExport} disabled={isLoading}>
                         Export
                     </button>
 
@@ -250,6 +250,7 @@ const RolePage = () => {
                             accept=".xlsx,.xls"
                             style={{ display: 'none' }}
                             onChange={(e) => handleImport(e)}
+                            disabled={isLoading}
                         />
                     </label>
                 </div>

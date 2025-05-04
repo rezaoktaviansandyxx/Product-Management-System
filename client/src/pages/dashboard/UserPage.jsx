@@ -173,7 +173,7 @@ const UserPage = () => {
 
             <div className="row mb-3">
                 <div className="col-md-6">
-                    <button className="btn btn-primary" onClick={handleAddUser}>
+                    <button className="btn btn-primary" onClick={handleAddUser} disabled={isLoading}>
                         Add User
                     </button>
                 </div>

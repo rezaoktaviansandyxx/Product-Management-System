@@ -245,11 +245,11 @@ const SupplierPage = () => {
 
       <div className="row mb-3">
         <div className="col-md-6">
-          <button className="btn btn-primary me-2" onClick={handleAddSupplier}>
+          <button className="btn btn-primary me-2" onClick={handleAddSupplier} disabled={isLoading}>
             Add Supplier
           </button>
 
-          <button className="btn btn-success me-2" onClick={handleExport}>
+          <button className="btn btn-success me-2" onClick={handleExport} disabled={isLoading}>
             Export
           </button>
 
@@ -261,6 +261,7 @@ const SupplierPage = () => {
               accept=".xlsx,.xls"
               style={{ display: 'none' }}
               onChange={(e) => handleImport(e)}
+              disabled={isLoading}
             />
           </label>
         </div>
