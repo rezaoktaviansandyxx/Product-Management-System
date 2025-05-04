@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class SupplierExport implements FromCollection, WithHeadings, WithMapping
 {
+    private $index = 0;
 
     public function collection()
     {
@@ -19,7 +20,7 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'No',
+            'Id',
             'Name',
             'Address',
             'Phone',
@@ -32,10 +33,10 @@ class SupplierExport implements FromCollection, WithHeadings, WithMapping
         // Parse contact_info jika ada
         $contact_info = json_decode($supplier->contact_info, true);
         return [
-            $supplier->id, // atau nomor urut jika lebih prefer
+            $supplier->id,
             $supplier->name,
-            $metadata['address'] ?? '', // asumsi note ada di metadata
-            $metadata['phone'] ?? '',   // asumsi tag ada di metadata
+            $contact_info['address'] ?? '', // asumsi note ada di contact_info
+            $contact_info['phone'] ?? '',   // asumsi tag ada di contact_info
             $supplier->is_active ? 'Active' : 'Inactive'
         ];
     }

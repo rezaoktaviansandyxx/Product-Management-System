@@ -18,7 +18,7 @@ class CategoriesExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'No',
+            'Id',
             'Name',
             'Description',
             'Note',
@@ -33,11 +33,11 @@ class CategoriesExport implements FromCollection, WithHeadings, WithMapping
         $metadata = json_decode($category->metadata, true);
 
         return [
-            $category->id, // atau nomor urut jika lebih prefer
+            $category->id,
             $category->name,
             $category->description,
-            $metadata['note'] ?? '', // asumsi note ada di metadata
-            $metadata['tag'] ?? '',   // asumsi tag ada di metadata
+            $metadata['note'] ?? '',
+            $metadata['tags'] ?? '',
             $category->is_active ? 'Active' : 'Inactive'
         ];
     }

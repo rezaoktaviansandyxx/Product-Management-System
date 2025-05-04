@@ -3,7 +3,6 @@
 namespace App\Imports;
 
 use App\Models\Product;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -101,22 +100,22 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
         return (int) $stock;
     }
 
-    private function validateCategoryId(string $categoryId): int
+    private function validateCategoryId(string $categoryId): string
     {
         if (empty(trim($categoryId))) {
             throw new \Exception('Category ID cannot be empty');
         }
 
-        return (int) $categoryId;
+        return $categoryId;
     }
 
-    private function validateSupplierId(string $supplierId): int
+    private function validateSupplierId(string $supplierId): string
     {
         if (empty(trim($supplierId))) {
             throw new \Exception('Supplier ID cannot be empty');
         }
 
-        return (int) $supplierId;
+        return $supplierId;
     }
 
     public function rules(): array
@@ -128,8 +127,8 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
             'tag' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'required|exists:suppliers,id',
+            'category_id' => 'required|string|exists:categories,id',
+            'supplier_id' => 'required|string|exists:suppliers,id',
             'status' => [
                 'nullable',
                 function ($attribute, $value, $fail) {

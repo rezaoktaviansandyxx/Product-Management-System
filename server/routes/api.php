@@ -34,6 +34,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/roles', [RoleController::class, 'index']);
 
+// Route::get('/products/export', [ProductController::class, 'export']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -43,23 +45,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('audit-logs', AuditLogController::class);
 
     // Categories
-    Route::apiResource('categories', CategoryController::class);
     Route::post('/categories/import', [CategoryController::class, 'import']);
     Route::get('/categories/export', [CategoryController::class, 'export']);
+    Route::apiResource('categories', CategoryController::class);
     Route::post('/categories/{category}/restore', [CategoryController::class, 'restore'])
         ->withTrashed();
 
     // Suppliers
-    Route::apiResource('suppliers', SupplierController::class);
     Route::post('/suppliers/import', [SupplierController::class, 'import']);
     Route::get('/suppliers/export', [SupplierController::class, 'export']);
+    Route::apiResource('suppliers', SupplierController::class);
     Route::post('/suppliers/{supplier}/restore', [SupplierController::class, 'restore'])
         ->withTrashed();
 
     // Products
-    Route::apiResource('products', ProductController::class);
     Route::post('/products/import', [ProductController::class, 'import']);
     Route::get('/products/export', [ProductController::class, 'export']);
+    Route::apiResource('products', ProductController::class);
     Route::post('/products/{product}/restore', [ProductController::class, 'restore'])
         ->withTrashed();
 
@@ -71,12 +73,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/{product}/attachments/{attachment}/download', [ProductAttachmentController::class, 'download']);
 
     // Roles
+    Route::post('/roles/import', [RoleController::class, 'import']);
+    Route::get('/roles/export', [RoleController::class, 'export']);
     Route::get('/roles/{role}', [RoleController::class, 'show']);
     Route::post('/roles', [RoleController::class, 'store']);
     Route::put('/roles/{role}', [RoleController::class, 'update']);
     Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
-    Route::post('/roles/import', [RoleController::class, 'import']);
-    Route::get('/roles/export', [RoleController::class, 'export']);
     Route::post('/roles/{role}/restore', [RoleController::class, 'restore'])
         ->withTrashed();
 });

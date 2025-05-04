@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class ProductExport implements FromCollection, WithHeadings, WithMapping
 {
+
     /**
      * @return \Illuminate\Support\Collection
      */
@@ -21,7 +22,7 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'No',
+            'Id',
             'Name',
             'Description',
             'Serial Number',
@@ -29,18 +30,20 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'Price',
             'Stock',
             'Category ID',
+            'Category Name',
             'Supplier ID',
+            'Supplier Name',
             'Is Active'
         ];
     }
 
     public function map($product): array
     {
-        // Parse metadata jika ada
+        // Parse specifications jika ada
         $specifications = json_decode($product->specifications, true);
 
         return [
-            $product->id, // atau nomor urut jika lebih prefer
+            $product->id,
             $product->name,
             $product->description,
             $specifications['serial_number'] ?? '',
@@ -48,7 +51,9 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             $product->price,
             $product->stock,
             $product->category_id,
+            $product->category->name,
             $product->supplier_id,
+            $product->supplier->name,
             $product->is_active ? 'Active' : 'Inactive'
         ];
     }

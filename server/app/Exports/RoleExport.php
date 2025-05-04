@@ -21,7 +21,7 @@ class RoleExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'No',
+            'Id',
             'Name',
             'Status'
         ];
