@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardNavbar from '../components/DashboardNavbar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import '../style/DashboardContent.css';
+import axios from 'axios';
+import AppConfig from '../config/AppConfig';
 
 const DashboardPage = () => {
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,6 +14,8 @@ const DashboardPage = () => {
       navigate("/");
     }
   }, [navigate]);
+
+
 
   return (
     <div className="dashboard-container">
@@ -25,6 +28,26 @@ const DashboardPage = () => {
 };
 
 export function DashboardContent() {
+  const [products, setProducts] = useState([]);
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      fetchProducts();
+    }
+
+  }, [token]);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(AppConfig.API_URL + '/products');
+      setProducts(response.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="dashboard-content-container">
       <h1 className="dashboard-title">Dashboard Overview</h1>
@@ -34,15 +57,11 @@ export function DashboardContent() {
 
       <div className="stats-container">
         <div className="stat-card">
-          <h2 className="stat-title">Total Produk</h2>
-          <p className="stat-value">123</p>
+          <h2 className="stat-title">Total Products</h2>
+          <p className="stat-value">{products.length}</p>
         </div>
         <div className="stat-card">
-          <h2 className="stat-title">Pengguna Aktif</h2>
-          <p className="stat-value">58</p>
-        </div>
-        <div className="stat-card">
-          <h2 className="stat-title">Laporan Hari Ini</h2>
+          <h2 className="stat-title">Today's Report</h2>
           <p className="stat-value">9</p>
         </div>
       </div>

@@ -25,6 +25,7 @@ const RegisterPage = () => {
 
   const [roles, setRoles] = useState([]);
   const [show, setShow] = useState({ password: false, confirm: false });
+  const [isLoading, setIsLoading] = useState(false);
 
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
@@ -111,9 +112,9 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
+
+    setIsLoading(true); // Start loading
 
     try {
       await axios.post(AppConfig.API_URL + '/register', {
@@ -169,6 +170,8 @@ const RegisterPage = () => {
           text: error.message
         });
       }
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -274,7 +277,9 @@ const RegisterPage = () => {
             {errors.role_name && <span className="error-text">{errors.role_name}</span>}
           </div>
 
-          <button type="submit" className="register-button">Register</button>
+          <button type="submit" className="register-button" disabled={isLoading}>
+            {isLoading ? 'Registering...' : 'Register'}
+          </button>
         </form>
 
         <div className="login-link">

@@ -11,6 +11,7 @@ const DashboardNavbar = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [role, setRole] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -44,6 +45,8 @@ const DashboardNavbar = () => {
 
     if (result.isConfirmed) {
       try {
+        setIsLoading(true); // Start loading
+
         await axios.post(AppConfig.API_URL + '/logout');
         localStorage.removeItem('token');
 
@@ -61,6 +64,8 @@ const DashboardNavbar = () => {
           text: error.message,
           icon: 'error'
         });
+      } finally {
+        setIsLoading(false); // End loading
       }
     }
   };
@@ -106,8 +111,8 @@ const DashboardNavbar = () => {
             </li>
           ))}
         </ul>
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
+        <button className="logout-button" onClick={handleLogout} disabled={isLoading}>
+          {isLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
     </nav>

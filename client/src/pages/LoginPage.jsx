@@ -18,6 +18,7 @@ const LoginPage = () => {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
@@ -69,9 +70,9 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
+
+    setIsLoading(true); // Start loading
 
     try {
       const response = await axios.post(AppConfig.API_URL + '/login', formData, {
@@ -122,6 +123,8 @@ const LoginPage = () => {
           text: 'Please check your connection and try again.'
         });
       }
+    } finally {
+      setIsLoading(false); // End loading
     }
   };
 
@@ -169,7 +172,9 @@ const LoginPage = () => {
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
 
-          <button type="submit" className="login-button">Login</button>
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
 
         <div className="login-links">

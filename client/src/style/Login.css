@@ -154,6 +154,11 @@
     display: block;
 }
 
+.login-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
     .login-card {

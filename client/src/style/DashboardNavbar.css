@@ -77,6 +77,11 @@
     background-color: #c0392b;
 }
 
+.logout-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 /* Mobile styles */
 @media (max-width: 768px) {
     .mobile-menu-toggle {

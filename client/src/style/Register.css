@@ -145,6 +145,11 @@
     display: block;
 }
 
+.register-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
     .register-card {
