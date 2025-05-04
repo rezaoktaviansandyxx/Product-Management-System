@@ -17,6 +17,7 @@ const RolePage = () => {
         direction: 'ascending'
     });
     const [userRoleName, setUserRoleName] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -76,11 +77,14 @@ const RolePage = () => {
 
     const fetchRoles = async () => {
         try {
+            setIsLoading(true); // start loading
             const response = await axios.get(AppConfig.API_URL + '/roles');
             setRoles(response.data.data);
             setFilteredRoles(response.data.data);
         } catch (err) {
             console.error(err);
+        } finally {
+            setIsLoading(false); // stop loading
         }
     };
 
@@ -299,7 +303,15 @@ const RolePage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredRoles.length > 0 ? (
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan="4" className="text-center">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredRoles.length > 0 ? (
                                     filteredRoles.map((role, index) => (
                                         <tr key={role.id}>
                                             <th scope="row">{index + 1}</th>

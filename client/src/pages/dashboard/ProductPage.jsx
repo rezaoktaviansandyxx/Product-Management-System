@@ -16,6 +16,7 @@ const ProductPage = () => {
     key: 'name',
     direction: 'ascending'
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   const token = localStorage.getItem("token");
 
@@ -93,12 +94,15 @@ const ProductPage = () => {
   }, [sortConfig, products, searchTerm]);
 
   const fetchProducts = async () => {
+    setIsLoading(true); // mulai loading
     try {
       const response = await axios.get(AppConfig.API_URL + '/products');
       setProducts(response.data.data);
       setFilteredProducts(response.data.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false); // selesai loading
     }
   };
 
@@ -321,7 +325,15 @@ const ProductPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.length > 0 ? (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="11" className="text-center">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredProducts.length > 0 ? (
                   filteredProducts.map((product, index) => (
                     <tr key={product.id}>
                       <td>{index + 1}</td>
@@ -377,7 +389,9 @@ const ProductPage = () => {
                 ) : (
                   <tr>
                     <td colSpan="11" className="text-center">
-                      {searchTerm ? 'No products matching your search criteria.' : 'No products available.'}
+                      {searchTerm
+                        ? 'No products matching your search criteria.'
+                        : 'No products available.'}
                     </td>
                   </tr>
                 )}

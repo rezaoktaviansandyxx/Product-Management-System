@@ -16,6 +16,8 @@ const UserPage = () => {
         key: 'username',
         direction: 'ascending'
     });
+    const [isLoading, setIsLoading] = useState(true);
+
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -85,11 +87,14 @@ const UserPage = () => {
 
     const fetchUsers = async () => {
         try {
+            setIsLoading(true); // start loading
             const response = await axios.get(AppConfig.API_URL + '/users');
             setUsers(response.data);
             setFilteredUsers(response.data);
         } catch (err) {
             console.error(err);
+        } finally {
+            setIsLoading(false); // stop loading
         }
     };
 
@@ -236,7 +241,15 @@ const UserPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredUsers.length > 0 ? (
+                                { isLoading ? (
+                                    <tr>    
+                                        <td colSpan="6" className="text-center">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredUsers.length > 0 ? (
                                     filteredUsers.map((user, index) => (
                                         <tr key={user.id}>
                                             <th scope="row">{index + 1}</th>

@@ -16,6 +16,8 @@ const CategoryPage = () => {
     key: 'name',
     direction: 'ascending'
   });
+  const [isLoading, setIsLoading] = useState(true);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -90,12 +92,15 @@ const CategoryPage = () => {
   }, [sortConfig, categories, searchTerm]);
 
   const fetchCategories = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(AppConfig.API_URL + '/categories');
       setCategories(response.data.data);
       setFilteredCategories(response.data.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -314,7 +319,15 @@ const CategoryPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredCategories.length > 0 ? (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredCategories.length > 0 ? (
                   filteredCategories.map((category, index) => (
                     <tr key={category.id}>
                       <th scope="row">{index + 1}</th>
@@ -357,7 +370,9 @@ const CategoryPage = () => {
                 ) : (
                   <tr>
                     <td colSpan="6" className="text-center">
-                      {searchTerm ? 'No categories matching your search criteria.' : 'No categories found.'}
+                      {searchTerm
+                        ? 'No categories matching your search criteria.'
+                        : 'No categories found.'}
                     </td>
                   </tr>
                 )}
