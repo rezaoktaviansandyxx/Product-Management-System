@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SupplierExport;
+use App\Imports\SupplierImport;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class SupplierController extends Controller
 {
@@ -172,5 +176,38 @@ class SupplierController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Import suppliers from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048'
+        ]);
+
+        try {
+            $import = new SupplierImport();
+            Excel::import($import, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Suppliers imported successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error importing suppliers',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export suppliers to Excel
+     */
+    public function export(): BinaryFileResponse
+    {
+        $datetime = now()->format('Ymd_His');
+        return Excel::download(new SupplierExport(), "{$datetime}_suppliers.xlsx");
     }
 }

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RoleExport;
+use App\Imports\RoleImport;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RoleController extends Controller
 {
@@ -119,5 +123,38 @@ class RoleController extends Controller
             'message' => 'Role restored successfully!',
             'data' => $role
         ]);
+    }
+
+    /**
+     * Import roles from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048'
+        ]);
+
+        try {
+            $import = new RoleImport();
+            Excel::import($import, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Roles imported successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error importing roles',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export roles to Excel
+     */
+    public function export(): BinaryFileResponse
+    {
+        $datetime = now()->format('Ymd_His');
+        return Excel::download(new RoleExport(), "{$datetime}_roles.xlsx");
     }
 }

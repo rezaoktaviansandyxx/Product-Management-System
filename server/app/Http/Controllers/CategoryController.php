@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoriesExport;
+use App\Imports\CategoriesImport;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CategoryController extends Controller
 {
@@ -128,5 +132,35 @@ class CategoryController extends Controller
             'message' => 'Category restored successfully!',
             'data' => $category
         ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048'
+        ]);
+
+        try {
+            $import = new CategoriesImport();
+            Excel::import($import, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Categories imported successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error importing categories',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export categories to Excel
+     */
+    public function export(): BinaryFileResponse
+    {
+        $datetime = now()->format('Ymd_His');
+        return Excel::download(new CategoriesExport(), "{$datetime}_categories.xlsx");
     }
 }

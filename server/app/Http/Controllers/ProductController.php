@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
+use App\Imports\ProductImport;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductController extends Controller
 {
@@ -167,5 +171,38 @@ class ProductController extends Controller
             'message' => 'Product restored successfully!',
             'data' => $product->load(['category', 'supplier'])
         ]);
+    }
+
+    /**
+     * Import suppliers from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048'
+        ]);
+
+        try {
+            $import = new ProductImport();
+            Excel::import($import, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Suppliers imported successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error importing suppliers',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export suppliers to Excel
+     */
+    public function export(): BinaryFileResponse
+    {
+        $datetime = now()->format('Ymd_His');
+        return Excel::download(new ProductExport(), "{$datetime}_products.xlsx");
     }
 }
