@@ -50,10 +50,10 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             $specifications['tags'] ?? '',
             $product->price,
             $product->stock,
-            $product->category_id,
-            $product->category->name,
-            $product->supplier_id,
-            $product->supplier->name,
+            $product->category->is_active == true ? $product->category_id : '',
+            $product->category->is_active == true ? $product->category->name : '',
+            $product->supplier->is_active == true ? $product->supplier_id : '',
+            $product->supplier->is_active == true ? $product->supplier->name : '',
             $product->is_active ? 'Active' : 'Inactive'
         ];
     }
