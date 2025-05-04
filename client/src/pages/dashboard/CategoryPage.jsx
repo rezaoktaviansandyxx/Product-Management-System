@@ -158,6 +158,65 @@ const CategoryPage = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleExport = () => {
+    axios.get(AppConfig.API_URL + '/categories/export', {
+      responseType: 'blob'
+    }).then((response) => {
+      const now = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      const datetime = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${datetime}_categories.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+    });
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post(`${AppConfig.API_URL}/categories/import`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      Swal.fire('Success', 'Data imported successfully!', 'success', { timer: 2000 });
+      await fetchCategories(); // Refresh data
+    } catch (error) {
+      if (error.response && error.response.status === 422) {
+        const validationErrors = error.response.data.errors;
+        let htmlError = '';
+        Object.entries(validationErrors).forEach(([row, errors]) => {
+          htmlError += `<strong>Row ${row}:</strong><ul>`;
+          errors.forEach(err => {
+            htmlError += `<li>${err}</li>`;
+          });
+          htmlError += '</ul>';
+        });
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          html: htmlError,
+          width: '600px',
+        });
+      } else {
+        Swal.fire('Error', 'Failed to import data.', 'error');
+      }
+    } finally {
+      e.target.value = ''; // Reset input file agar bisa upload file yang sama lagi
+    }
+  };
+
   // Helper function to get sort indicator
   const getSortIndicator = (key) => {
     if (sortConfig.key === key) {
@@ -172,9 +231,24 @@ const CategoryPage = () => {
 
       <div className="row mb-3">
         <div className="col-md-6">
-          <button className="btn btn-primary" onClick={handleAddCategory}>
+          <button className="btn btn-primary me-2" onClick={handleAddCategory}>
             Add Category
           </button>
+
+          <button className="btn btn-success me-2" onClick={handleExport}>
+            Export
+          </button>
+
+          <label htmlFor="import" className="btn btn-info me-2">
+            Import
+            <input
+              id="import"
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ display: 'none' }}
+              onChange={(e) => handleImport(e)}
+            />
+          </label>
         </div>
         <div className="col-md-6">
           <div className="input-group">

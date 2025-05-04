@@ -25,7 +25,6 @@ const AuditLogTable = ({tableName}) => {
             }
         })
             .then(response => {
-                console.log(response.data.data);
                 setLogs(response.data.data);
             })
             .catch(error => {

@@ -87,7 +87,6 @@ const RolePage = () => {
     const fetchUserRole = async () => {
         try {
             const response = await axios.get(AppConfig.API_URL + '/me');
-            console.log(response);
             setUserRoleName(response.data.role_name);
         } catch (err) {
             console.error("Failed to fetch user role", err);
@@ -142,6 +141,65 @@ const RolePage = () => {
         }
     };
 
+    const handleExport = () => {
+        axios.get(AppConfig.API_URL + '/roles/export', {
+            responseType: 'blob'
+        }).then((response) => {
+            const now = new Date();
+            const pad = (n) => n.toString().padStart(2, '0');
+            const datetime = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${datetime}_roles.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+        });
+    };
+
+    const handleImport = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            await axios.post(`${AppConfig.API_URL}/roles/import`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            Swal.fire('Success', 'Data imported successfully!', 'success', { timer: 2000 });
+            await fetchRoles(); // Refresh data
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                const validationErrors = error.response.data.errors;
+                let htmlError = '';
+                Object.entries(validationErrors).forEach(([row, errors]) => {
+                    htmlError += `<strong>Row ${row}:</strong><ul>`;
+                    errors.forEach(err => {
+                        htmlError += `<li>${err}</li>`;
+                    });
+                    htmlError += '</ul>';
+                });
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: htmlError,
+                    width: '600px',
+                });
+            } else {
+                Swal.fire('Error', 'Failed to import data.', 'error');
+            }
+        } finally {
+            e.target.value = ''; // Reset input file agar bisa upload file yang sama lagi
+        }
+    };
+
     // Sorting functionality
     const requestSort = (key) => {
         let direction = 'ascending';
@@ -172,9 +230,24 @@ const RolePage = () => {
 
             <div className="row mb-3">
                 <div className="col-md-6">
-                    <button className="btn btn-primary" onClick={handleAddRole}>
+                    <button className="btn btn-primary me-2" onClick={handleAddRole}>
                         Add Role
                     </button>
+
+                    <button className="btn btn-success me-2" onClick={handleExport}>
+                        Export
+                    </button>
+
+                    <label htmlFor="import" className="btn btn-info me-2">
+                        Import
+                        <input
+                            id="import"
+                            type="file"
+                            accept=".xlsx,.xls"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleImport(e)}
+                        />
+                    </label>
                 </div>
                 <div className="col-md-6">
                     <div className="input-group">
