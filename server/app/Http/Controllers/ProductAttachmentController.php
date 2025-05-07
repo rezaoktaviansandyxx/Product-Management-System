@@ -92,7 +92,6 @@ class ProductAttachmentController extends Controller
         ]);
     }
 
-
     public function download(Product $product, ProductAttachment $attachment)
     {
         if ($attachment->product_id !== $product->id) {

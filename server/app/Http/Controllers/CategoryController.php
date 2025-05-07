@@ -134,6 +134,12 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function deleted()
+    {
+        $deleteCategories = Category::onlyTrashed()->get();
+        return response()->json($deleteCategories);
+    }
+
     public function import(Request $request)
     {
         $request->validate([

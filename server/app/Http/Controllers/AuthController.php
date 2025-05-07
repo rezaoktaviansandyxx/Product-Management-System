@@ -166,25 +166,10 @@ class AuthController extends Controller
      */
     public function deleteUser(User $user)
     {
-        $user->delete();
-        $user->deleted_by = auth()->user()->id;
-        $user->save();
+        $user->forceDelete();
 
         return response()->json([
             'message' => 'User deleted successfully'
-        ]);
-    }
-
-    /**
-     * Restore a deleted user (admin only)
-     */
-    public function restoreUser($userId)
-    {
-        $user = User::withTrashed()->findOrFail($userId);
-        $user->restore();
-
-        return response()->json([
-            'message' => 'User restored successfully',
         ]);
     }
 }

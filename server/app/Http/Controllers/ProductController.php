@@ -173,6 +173,12 @@ class ProductController extends Controller
         ]);
     }
 
+    public function deleted()
+    {
+        $deleteProducts = Product::onlyTrashed()->get();
+        return response()->json($deleteProducts);
+    }
+
     /**
      * Import suppliers from Excel
      */

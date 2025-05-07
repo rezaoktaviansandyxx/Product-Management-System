@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Categories
     Route::post('/categories/import', [CategoryController::class, 'import']);
     Route::get('/categories/export', [CategoryController::class, 'export']);
+    Route::get('/categories/deleted', [CategoryController::class, 'deleted']);
     Route::apiResource('categories', CategoryController::class);
     Route::post('/categories/{category}/restore', [CategoryController::class, 'restore'])
         ->withTrashed();
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Suppliers
     Route::post('/suppliers/import', [SupplierController::class, 'import']);
     Route::get('/suppliers/export', [SupplierController::class, 'export']);
+    Route::get('/suppliers/deleted', [SupplierController::class, 'deleted']);
     Route::apiResource('suppliers', SupplierController::class);
     Route::post('/suppliers/{supplier}/restore', [SupplierController::class, 'restore'])
         ->withTrashed();
@@ -61,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Products
     Route::post('/products/import', [ProductController::class, 'import']);
     Route::get('/products/export', [ProductController::class, 'export']);
+    Route::get('/products/deleted', [ProductController::class, 'deleted']);
     Route::apiResource('products', ProductController::class);
     Route::post('/products/{product}/restore', [ProductController::class, 'restore'])
         ->withTrashed();
@@ -75,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Roles
     Route::post('/roles/import', [RoleController::class, 'import']);
     Route::get('/roles/export', [RoleController::class, 'export']);
+    Route::get('/roles/deleted', [RoleController::class, 'deleted']);
     Route::get('/roles/{role}', [RoleController::class, 'show']);
     Route::post('/roles', [RoleController::class, 'store']);
     Route::put('/roles/{role}', [RoleController::class, 'update']);

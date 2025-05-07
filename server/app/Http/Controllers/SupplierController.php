@@ -150,6 +150,12 @@ class SupplierController extends Controller
         ]);
     }
 
+    public function deleted()
+    {
+        $deleteSuppliers = Supplier::onlyTrashed()->get();
+        return response()->json($deleteSuppliers);
+    }
+
     public function restore($id)
     {
         try {

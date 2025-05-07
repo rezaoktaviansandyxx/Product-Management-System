@@ -125,6 +125,12 @@ class RoleController extends Controller
         ]);
     }
 
+    public function deleted()
+    {
+        $deleteRoles = Role::onlyTrashed()->get();
+        return response()->json($deleteRoles);
+    }
+
     /**
      * Import roles from Excel
      */
