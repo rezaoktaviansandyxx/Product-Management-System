@@ -70,7 +70,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $user->last_login_at = now();
+        $user->last_login_at = now('Asia/Jakarta')->format('Y-m-d H:i:s');
         $user->save();
 
         // Set expiration time (1 days in seconds)
